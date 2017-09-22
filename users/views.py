@@ -168,7 +168,7 @@ def password(request, userid):
 @permission_required('admin')
 def index(request):
     """ Affiche l'ensemble des users, need droit admin """
-    users_list = User.objects.order_by('state', 'name')
+    users_list = User.objects.order_by('registered').reverse()
     paginator = Paginator(users_list, PAGINATION_NUMBER)
     page = request.GET.get('page')
     try:
