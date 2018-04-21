@@ -10,12 +10,12 @@ Type=forking
 User=root
 Group=root
 PIDFile=/run/portail_captif.pid
-WorkingDirectory=/var/www/portail_captif/
-ExecStartPre=/usr/bin/python3 /var/www/portail_captif/manage.py start_portail
+WorkingDirectory=/var/www/django-portail-captif/
+ExecStartPre=/usr/bin/python3 /var/www/django-portail-captif/manage.py start_portail
 ExecStart=/usr/bin/gunicorn3 portail_captif.wsgi:application --pid=/run/portail_captif.pid --name www-data --user www-data --group www-data --daemon --log-file /var/log/gunicorn/portail_captif.log --log-level=info --bind=unix:///tmp/gunicorn-portail_captif.sock --workers=1
 ExecReload=/bin/kill -s HUP $MAINPID
 ExecStop=/bin/kill -s TERM $MAINPID
-ExecStopPost=/usr/bin/python3 /var/www/portail_captif/manage.py stop_portail
+ExecStopPost=/usr/bin/python3 /var/www/django-portail-captif/manage.py stop_portail
 Restart=on-failure
 RestartSec=65
 StartLimitInterval=60
