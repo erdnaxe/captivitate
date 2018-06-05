@@ -30,7 +30,7 @@ from django.utils.functional import cached_property
 
 from macaddress.fields import MACAddressField
 
-from portail_captif.settings import GENERIC_IPSET_COMMAND, IPSET_NAME, REQ_EXPIRE_HRS,FORBIDEN_INTERFACES, SERVER_SELF_IP, AUTORIZED_INTERFACES, PORTAIL_ACTIVE
+from portail_captif.settings import GENERIC_IPSET_COMMAND, IPSET_NAME, REQ_EXPIRE_HRS,FORBIDEN_INTERFACES, SERVER_SELF_IP, AUTORIZED_INTERFACES, PORTAIL_ACTIVE, INTERNAL_INTERFACE
 import re, uuid
 import datetime
 
@@ -96,6 +96,11 @@ def gen_filter(ipt):
     ipt.init_filter("OUTPUT")
     for interface in FORBIDEN_INTERFACES:
         ipt.add("filter", "-A FORWARD -o %s -j REJECT --reject-with icmp-port-unreachable" % interface)
+    ipt.add("filter", "-A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT")
+    for interface in AUTORIZED_INTERFACES:
+        ipt.add("filter", "-A FORWARD -o %s -m set --match-set portail_captif src,dst -j ACCEPT" % interface)
+        ipt.add("filter", "-A FORWARD -i %s -m set --match-set portail_captif src,dst -j ACCEPT" % interface)
+    ipt.add("filter", "-A FORWARD -j REJECT") 
     ipt.commit("filter")
     return ipt
 
@@ -109,7 +114,7 @@ def gen_nat(ipt, nat_active=True):
         ipt.jump("nat", "PREROUTING", "CAPTIF")
         ipt.jump("nat", "POSTROUTING", "MASQUERADE")
         if PORTAIL_ACTIVE:
-            ipt.add("nat", "-A CAPTIF -m set ! --match-set %s src -j DNAT --to-destination %s" % (IPSET_NAME, SERVER_SELF_IP))
+            ipt.add("nat", "-A CAPTIF -i %s -m set ! --match-set %s src,dst -j DNAT --to-destination %s" % (INTERNAL_INTERFACE, IPSET_NAME, SERVER_SELF_IP))
         ipt.jump("nat", "CAPTIF", "RETURN")
     ipt.commit("nat")
     return ipt
