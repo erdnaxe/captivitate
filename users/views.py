@@ -1,57 +1,34 @@
-# Re2o est un logiciel d'administration développé initiallement au rezometz. Il
-# se veut agnostique au réseau considéré, de manière à être installable en
-# quelques clics.
-#
-# Copyright © 2017  Gabriel Détraz
-# Copyright © 2017  Goulven Kermarec
-# Copyright © 2017  Augustin Lemesle
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+# -*- mode: python; coding: utf-8 -*-
+# SPDX-License-Identifier: GPL-2.0-or-later
 
-# App de gestion des users pour portail_captif
-# Goulven Kermarec, Gabriel Détraz, Lemesle Augustin
-# Gplv2
-from django.shortcuts import get_object_or_404, render, redirect
-from django.template.context_processors import csrf
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.template import Context, RequestContext, loader
+import ipaddress
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.signals import user_logged_in
-from django.db.models import Max, ProtectedError
-from django.db import IntegrityError
 from django.core.mail import send_mail
-from django.utils import timezone
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.db import transaction
-
-from reversion.models import Version
+from django.shortcuts import get_object_or_404, render, redirect
+from django.template import Context, loader
+from django.template.context_processors import csrf
+from django.utils import timezone
 from reversion import revisions as reversion
-from users.models import User, MachineForm, Request
-from users.models import EditInfoForm, InfoForm, BaseInfoForm, Machine, StateForm, mac_from_ip
-from users.forms import PassForm, ResetPasswordForm
-import ipaddress
-import subprocess
+from reversion.models import Version
 
-from portail_captif.settings import REQ_EXPIRE_STR, EMAIL_FROM, ASSO_NAME, ASSO_EMAIL, SITE_NAME, CAPTIVE_IP_RANGE, CAPTIVE_WIFI, PAGINATION_NUMBER
+from portail_captif.settings import REQ_EXPIRE_STR, EMAIL_FROM, ASSO_NAME, \
+    ASSO_EMAIL, SITE_NAME, CAPTIVE_IP_RANGE, CAPTIVE_WIFI, PAGINATION_NUMBER
+from users.forms import PassForm, ResetPasswordForm
+from users.models import InfoForm, BaseInfoForm, Machine, StateForm, mac_from_ip
+from users.models import User, Request
 
 
 def form(ctx, template, request):
     c = ctx
     c.update(csrf(request))
     return render(request, template, c)
+
 
 def password_change_action(u_form, user, request, req=False):
     """ Fonction qui effectue le changeemnt de mdp bdd"""
@@ -68,20 +45,21 @@ def password_change_action(u_form, user, request, req=False):
         return redirect("/")
     return redirect("/users/profil/" + str(user.id))
 
+
 def reset_passwd_mail(req, request):
     """ Prend en argument un request, envoie un mail de réinitialisation de mot de pass """
     t = loader.get_template('users/email_passwd_request')
     c = Context({
-      'name': str(req.user.name) + ' ' + str(req.user.surname),
-      'asso': ASSO_NAME,
-      'asso_mail': ASSO_EMAIL,
-      'site_name': SITE_NAME,
-      'url': request.build_absolute_uri(
-       reverse('users:process', kwargs={'token': req.token})),
-       'expire_in': REQ_EXPIRE_STR,
+        'name': str(req.user.name) + ' ' + str(req.user.surname),
+        'asso': ASSO_NAME,
+        'asso_mail': ASSO_EMAIL,
+        'site_name': SITE_NAME,
+        'url': request.build_absolute_uri(
+            reverse('users:process', kwargs={'token': req.token})),
+        'expire_in': REQ_EXPIRE_STR,
     })
     send_mail('Votre compte %s' % SITE_NAME, t.render(c),
-    EMAIL_FROM, [req.user.email], fail_silently=False)
+              EMAIL_FROM, [req.user.email], fail_silently=False)
     return
 
 
@@ -98,10 +76,12 @@ def new_user(request):
         req.user = user
         req.save()
         reset_passwd_mail(req, request)
-        messages.success(request, "L'utilisateur %s a été crée, un mail pour l'initialisation du mot de passe a été envoyé" % user.pseudo)
+        messages.success(request,
+                         "L'utilisateur %s a été créé, un mail pour l'initialisation du mot de passe a été envoyé" % user.pseudo)
         capture_mac(request, user)
         return redirect("/users/profil/" + str(user.id))
     return form({'userform': user}, 'users/user.html', request)
+
 
 @login_required
 def edit_info(request, userid):
@@ -112,7 +92,8 @@ def edit_info(request, userid):
         messages.error(request, "Utilisateur inexistant")
         return redirect("/users/")
     if not request.user.is_admin and user != request.user:
-        messages.error(request, "Vous ne pouvez pas modifier un autre user que vous sans droit admin")
+        messages.error(request,
+                       "Vous ne pouvez pas modifier un autre user que vous sans droit admin")
         return redirect("/users/profil/" + str(request.user.id))
     if not request.user.is_admin:
         user = BaseInfoForm(request.POST or None, instance=user)
@@ -122,10 +103,12 @@ def edit_info(request, userid):
         with transaction.atomic(), reversion.create_revision():
             user.save()
             reversion.set_user(request.user)
-            reversion.set_comment("Champs modifié(s) : %s" % ', '.join(field for field in user.changed_data))
+            reversion.set_comment("Champs modifié(s) : %s" % ', '.join(
+                field for field in user.changed_data))
         messages.success(request, "L'user a bien été modifié")
         return redirect("/users/profil/" + userid)
     return form({'userform': user}, 'users/user.html', request)
+
 
 @login_required
 @permission_required('admin')
@@ -141,10 +124,12 @@ def state(request, userid):
         with transaction.atomic(), reversion.create_revision():
             state.save()
             reversion.set_user(request.user)
-            reversion.set_comment("Champs modifié(s) : %s" % ', '.join(field for field in state.changed_data))
+            reversion.set_comment("Champs modifié(s) : %s" % ', '.join(
+                field for field in state.changed_data))
         messages.success(request, "Etat changé avec succès")
         return redirect("/users/profil/" + userid)
     return form({'userform': state}, 'users/user.html', request)
+
 
 @login_required
 def password(request, userid):
@@ -157,12 +142,14 @@ def password(request, userid):
         messages.error(request, "Utilisateur inexistant")
         return redirect("/users/")
     if not request.user.is_admin and user != request.user:
-        messages.error(request, "Vous ne pouvez pas modifier un autre user que vous sans droit admin")
+        messages.error(request,
+                       "Vous ne pouvez pas modifier un autre user que vous sans droit admin")
         return redirect("/users/profil/" + str(request.user.id))
     u_form = PassForm(request.POST or None)
     if u_form.is_valid():
         return password_change_action(u_form, user, request)
     return form({'userform': u_form}, 'users/user.html', request)
+
 
 @login_required
 @permission_required('admin')
@@ -181,28 +168,31 @@ def index(request):
         users_list = paginator.page(paginator.num_pages)
     return render(request, 'users/index.html', {'users_list': users_list})
 
+
 @login_required
 def history(request, object, id):
     """ Affichage de l'historique : (acl, argument)
     user : self, userid"""
     if object == 'user':
         try:
-             object_instance = User.objects.get(pk=id)
+            object_instance = User.objects.get(pk=id)
         except User.DoesNotExist:
-             messages.error(request, "Utilisateur inexistant")
-             return redirect("/users/")
+            messages.error(request, "Utilisateur inexistant")
+            return redirect("/users/")
         if not request.user.is_admin and object_instance != request.user:
-             messages.error(request, "Vous ne pouvez pas afficher l'historique d'un autre user que vous sans droit admin")
-             return redirect("/users/profil/" + str(request.user.id))
+            messages.error(request,
+                           "Vous ne pouvez pas afficher l'historique d'un autre user que vous sans droit admin")
+            return redirect("/users/profil/" + str(request.user.id))
     elif object == 'machines':
         try:
-             object_instance = Machine.objects.get(pk=id)
+            object_instance = Machine.objects.get(pk=id)
         except User.DoesNotExist:
-             messages.error(request, "Machine inexistante")
-             return redirect("/users/")
+            messages.error(request, "Machine inexistante")
+            return redirect("/users/")
         if not request.user.is_admin and object_instance.proprio != request.user:
-             messages.error(request, "Vous ne pouvez pas afficher l'historique d'un autre user que vous sans droit admin")
-             return redirect("/users/profil/" + str(request.user.id))
+            messages.error(request,
+                           "Vous ne pouvez pas afficher l'historique d'un autre user que vous sans droit admin")
+            return redirect("/users/profil/" + str(request.user.id))
     else:
         messages.error(request, "Objet  inconnu")
         return redirect("/users/")
@@ -217,11 +207,14 @@ def history(request, object, id):
     except EmptyPage:
         # If page is out of range (e.g. 9999), deliver last page of results.
         reversions = paginator.page(paginator.num_pages)
-    return render(request, 'portail_captif/history.html', {'reversions': reversions, 'object': object_instance})
+    return render(request, 'portail_captif/history.html',
+                  {'reversions': reversions, 'object': object_instance})
+
 
 @login_required
 def mon_profil(request):
     return redirect("/users/profil/" + str(request.user.id))
+
 
 @login_required
 def profil(request, userid):
@@ -232,7 +225,8 @@ def profil(request, userid):
         return redirect("/users/")
     machines_list = Machine.objects.filter(proprio=users)
     if not request.user.is_admin and users != request.user:
-        messages.error(request, "Vous ne pouvez pas afficher un autre user que vous sans droit admin")
+        messages.error(request,
+                       "Vous ne pouvez pas afficher un autre user que vous sans droit admin")
         return redirect("/users/profil/" + str(request.user.id))
     return render(
         request,
@@ -242,6 +236,7 @@ def profil(request, userid):
             'machines_list': machines_list,
         }
     )
+
 
 def get_ip(request):
     """Returns the IP of the request, accounting for the possibility of being
@@ -255,9 +250,11 @@ def get_ip(request):
         ip = request.META.get("REMOTE_ADDR", "")
     return ip
 
+
 def capture_mac(request, users, verbose=True):
     remote_ip = get_ip(request)
-    if ipaddress.ip_address(remote_ip) in ipaddress.ip_network(CAPTIVE_IP_RANGE):
+    if ipaddress.ip_address(remote_ip) in ipaddress.ip_network(
+            CAPTIVE_IP_RANGE):
         mac_addr = mac_from_ip(remote_ip)
         if mac_addr:
             machine = Machine()
@@ -269,19 +266,24 @@ def capture_mac(request, users, verbose=True):
                     reversion.set_comment("Enregistrement de la machine")
             except:
                 if verbose:
-                    messages.error(request, "Assurez-vous que la machine n'est pas déjà enregistrée")
+                    messages.error(request,
+                                   "Assurez-vous que la machine n'est pas déjà enregistrée")
         else:
             if verbose:
                 messages.error(request, "Impossible d'enregistrer la machine")
     else:
         if verbose:
-            messages.error(request, "Merci de vous connecter sur le réseau du portail captif pour capturer la machine (WiFi %s)" % CAPTIVE_WIFI)
+            messages.error(request,
+                           "Merci de vous connecter sur le réseau du portail captif pour capturer la machine (WiFi %s)" % CAPTIVE_WIFI)
+
 
 def capture_mac_afterlogin(sender, user, request, **kwargs):
     capture_mac(request, user, verbose=False)
 
+
 # On récupère la mac après le login
 user_logged_in.connect(capture_mac_afterlogin)
+
 
 @login_required
 def capture(request):
@@ -294,11 +296,13 @@ def capture(request):
     capture_mac(request, users)
     return redirect("/users/profil/" + str(users.id))
 
+
 def reset_password(request):
     userform = ResetPasswordForm(request.POST or None)
     if userform.is_valid():
         try:
-            user = User.objects.get(pseudo=userform.cleaned_data['pseudo'],email=userform.cleaned_data['email'])
+            user = User.objects.get(pseudo=userform.cleaned_data['pseudo'],
+                                    email=userform.cleaned_data['email'])
         except User.DoesNotExist:
             messages.error(request, "Cet utilisateur n'existe pas")
             return form({'userform': userform}, 'users/user.html', request)
@@ -307,9 +311,11 @@ def reset_password(request):
         req.user = user
         req.save()
         reset_passwd_mail(req, request)
-        messages.success(request, "Un mail pour l'initialisation du mot de passe a été envoyé")
+        messages.success(request,
+                         "Un mail pour l'initialisation du mot de passe a été envoyé")
         redirect("/")
     return form({'userform': userform}, 'users/user.html', request)
+
 
 def process(request, token):
     valid_reqs = Request.objects.filter(expires_at__gt=timezone.now())
@@ -322,6 +328,7 @@ def process(request, token):
     else:
         messages.error(request, "Entrée incorrecte, contactez un admin")
         redirect("/")
+
 
 def process_passwd(request, req):
     u_form = PassForm(request.POST or None)
