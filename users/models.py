@@ -37,6 +37,7 @@ import datetime
 from django.utils import timezone
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 import subprocess
+from django_prometheus.models import ExportModelOperationsMixin
 
 def apply(cmd):
     return subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
@@ -96,11 +97,11 @@ def gen_filter(ipt):
     ipt.init_filter("OUTPUT")
     for interface in FORBIDEN_INTERFACES:
         ipt.add("filter", "-A FORWARD -o %s -j REJECT --reject-with icmp-port-unreachable" % interface)
-    ipt.add("filter", "-A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT")
+    ipt.add("filter", "-A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT")
     for interface in AUTORIZED_INTERFACES:
         ipt.add("filter", "-A FORWARD -o %s -m set --match-set portail_captif src,dst -j ACCEPT" % interface)
         ipt.add("filter", "-A FORWARD -i %s -m set --match-set portail_captif src,dst -j ACCEPT" % interface)
-    ipt.add("filter", "-A FORWARD -j REJECT") 
+    ipt.add("filter", "-A FORWARD -j REJECT")
     ipt.commit("filter")
     return ipt
 
@@ -187,7 +188,7 @@ class UserManager(BaseUserManager):
         return self._create_user(pseudo, name, surname, email, password, True)
 
 
-class User(AbstractBaseUser):
+class User(ExportModelOperationsMixin('user'), AbstractBaseUser):
     PRETTY_NAME = "Utilisateurs"
     STATE_ACTIVE = 0
     STATE_DISABLED = 1
@@ -267,7 +268,7 @@ class User(AbstractBaseUser):
         return self.name + " " + self.surname
 
 
-class Machine(models.Model):
+class Machine(ExportModelOperationsMixin('machine'), models.Model):
     proprio = models.ForeignKey('User', on_delete=models.PROTECT)
     mac_address = MACAddressField(integer=False, unique=True)
 
