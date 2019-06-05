@@ -77,7 +77,7 @@ def new_user(request):
         req.save()
         reset_passwd_mail(req, request)
         messages.success(request,
-                         "L'utilisateur %s a été crée, un mail pour l'initialisation du mot de passe a été envoyé" % user.pseudo)
+                         "L'utilisateur %s a été créé, un mail pour l'initialisation du mot de passe a été envoyé" % user.pseudo)
         capture_mac(request, user)
         return redirect("/users/profil/" + str(user.id))
     return form({'userform': user}, 'users/user.html', request)
