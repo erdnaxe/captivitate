@@ -1,45 +1,41 @@
-# Re2o est un logiciel d'administration développé initiallement au rezometz. Il
-# se veut agnostique au réseau considéré, de manière à être installable en
-# quelques clics.
-#
-# Copyright © 2017  Gabriel Détraz
-# Copyright © 2017  Goulven Kermarec
-# Copyright © 2017  Augustin Lemesle
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
-# -*- coding: utf-8 -*-
-
+# -*- mode: python; coding: utf-8 -*-
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.validators import MinLengthValidator
-from django.utils import timezone
 
 from .models import User
 
+
 class PassForm(forms.Form):
-    passwd1 = forms.CharField(label=u'Nouveau mot de passe', max_length=255, validators=[MinLengthValidator(8)], widget=forms.PasswordInput)
-    passwd2 = forms.CharField(label=u'Saisir à nouveau le mot de passe', max_length=255, validators=[MinLengthValidator(8)], widget=forms.PasswordInput)
+    passwd1 = forms.CharField(
+        label=u'Nouveau mot de passe', max_length=255,
+        validators=[MinLengthValidator(8)],
+        widget=forms.PasswordInput,
+    )
+    passwd2 = forms.CharField(
+        label=u'Saisir à nouveau le mot de passe',
+        max_length=255,
+        validators=[MinLengthValidator(8)],
+        widget=forms.PasswordInput,
+    )
 
 
 class UserCreationForm(forms.ModelForm):
     """A form for creating new users. Includes all the required
     fields, plus a repeated password."""
-    password1 = forms.CharField(label='Password', widget=forms.PasswordInput, validators=[MinLengthValidator(8)], max_length=255)
-    password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput, validators=[MinLengthValidator(8)], max_length=255)
+    password1 = forms.CharField(
+        label='Password', widget=forms.PasswordInput,
+        validators=[MinLengthValidator(8)],
+        max_length=255,
+    )
+    password2 = forms.CharField(
+        label='Password confirmation',
+        widget=forms.PasswordInput,
+        validators=[MinLengthValidator(8)],
+        max_length=255,
+    )
     is_admin = forms.BooleanField(label='is admin')
 
     class Meta:
@@ -94,7 +90,7 @@ class UserChangeForm(forms.ModelForm):
             user.save()
         return user
 
+
 class ResetPasswordForm(forms.Form):
     pseudo = forms.CharField(label=u'Pseudo', max_length=255)
     email = forms.EmailField(max_length=255)
-

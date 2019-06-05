@@ -1,55 +1,36 @@
 {% comment %}
-Re2o est un logiciel d'administration développé initiallement au rezometz. Il
-se veut agnostique au réseau considéré, de manière à être installable en
-quelques clics.
-
-Copyright © 2017  Gabriel Détraz
-Copyright © 2017  Goulven Kermarec
-Copyright © 2017  Augustin Lemesle
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along
-with this program; if not, write to the Free Software Foundation, Inc.,
-51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+SPDX-License-Identifier: GPL-2.0-or-later
 {% endcomment %}
 
- {% if reversions.paginator %}
- <ul class="pagination nav navbar-nav">
-    {% if reversions.has_previous %}
+{% if reversions.paginator %}
+    <ul class="pagination nav navbar-nav">
+        {% if reversions.has_previous %}
             <li><a href="?page={{ reversions.previous_page_number }}">Suivants</a></li>
-    {% endif %}
-    {% for page in reversions.paginator.page_range %}
-        <li class="{% if reversions.number == page  %}active{% endif %}"><a href="?page={{page }}">{{ page }}</a></li>
-    {% endfor %}
+        {% endif %}
+        {% for page in reversions.paginator.page_range %}
+            <li class="{% if reversions.number == page %}active{% endif %}"><a href="?page={{ page }}">{{ page }}</a>
+            </li>
+        {% endfor %}
 
-    {% if reversions.has_next %}
-        <li> <a href="?page={{ reversions.next_page_number }}">Précédents</a></li>
-    {% endif %}
- </ul>
- {% endif %}
+        {% if reversions.has_next %}
+            <li><a href="?page={{ reversions.next_page_number }}">Précédents</a></li>
+        {% endif %}
+    </ul>
+{% endif %}
 
 <table class="table table-striped">
     <thead>
+    <tr>
+        <th>Date</th>
+        <th>Cableur</th>
+        <th>Commentaire</th>
+    </tr>
+    </thead>
+    {% for rev in reversions %}
         <tr>
-            <th>Date</th>
-            <th>Cableur</th>
-            <th>Commentaire</th>
+            <td>{{ rev.revision.date_created }}</td>
+            <td>{{ rev.revision.user }}</td>
+            <td>{{ rev.revision.comment }}</td>
         </tr>
-   </thead>
-   {% for rev in reversions %}
-   <tr>
-       <td>{{ rev.revision.date_created }}</td>
-       <td>{{ rev.revision.user }}</td>
-       <td>{{ rev.revision.comment }}</td>
-   </tr>
-   {% endfor %}
+    {% endfor %}
 </table>

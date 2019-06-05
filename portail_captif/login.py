@@ -1,17 +1,14 @@
-# -*- coding: utf-8 -*-
-# Module d'authentification
-# David Sinquin, Gabriel Détraz, Goulven Kermarec
+# -*- mode: python; coding: utf-8 -*-
+# SPDX-License-Identifier: GPL-2.0-or-later
 
-
-import hashlib
 import binascii
+import hashlib
 import os
-from base64 import encodestring
 from base64 import decodestring
+from base64 import encodestring
 from collections import OrderedDict
 
 from django.contrib.auth import hashers
-
 
 ALGO_NAME = "{SSHA}"
 ALGO_LEN = len(ALGO_NAME + "$")
@@ -23,6 +20,7 @@ def makeSecret(password):
     h = hashlib.sha1(password.encode())
     h.update(salt)
     return ALGO_NAME + "$" + encodestring(h.digest() + salt).decode()[:-1]
+
 
 def checkPassword(challenge_password, password):
     challenge_bytes = decodestring(challenge_password[ALGO_LEN:].encode())
@@ -36,6 +34,7 @@ def checkPassword(challenge_password, password):
     for i, j in zip(digest, hr.digest()):
         valid_password &= i == j
     return valid_password
+
 
 class SSHAPasswordHasher(hashers.BasePasswordHasher):
     """
@@ -70,8 +69,8 @@ class SSHAPasswordHasher(hashers.BasePasswordHasher):
         return OrderedDict([
             ('algorithm', self.algorithm),
             ('iterations', 0),
-            ('salt', hashers.mask_hash(hash[2*DIGEST_LEN:], show=2)),
-            ('hash', hashers.mask_hash(hash[:2*DIGEST_LEN])),
+            ('salt', hashers.mask_hash(hash[2 * DIGEST_LEN:], show=2)),
+            ('hash', hashers.mask_hash(hash[:2 * DIGEST_LEN])),
         ])
 
     def harden_runtime(self, password, encoded):
@@ -81,4 +80,3 @@ class SSHAPasswordHasher(hashers.BasePasswordHasher):
         As we are not using multiple iterations the method is pretty useless
         """
         pass
-
