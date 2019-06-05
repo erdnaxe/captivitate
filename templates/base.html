@@ -3,22 +3,19 @@ SPDX-License-Identifier: GPL-2.0-or-later
 {% endcomment %}
 
 {% load staticfiles %}
-
-{# Load the tag library #}
 {% load bootstrap3 %}
 
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    {# Load CSS and JavaScript #}
+    <title>{{ site_name }} : {% block title %}Accueil{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     {% bootstrap_css %}
+    <link rel="stylesheet" href="{% static "/css/base.css" %}">
 
     {% bootstrap_javascript %}
-    <link rel="stylesheet" href="{% static "/css/base.css" %}">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ site_name }} : {% block title %}Accueil{% endblock %}</title>
 </head>
-
 <body>
 <div id="wrap">
     <nav class="navbar navbar-inverse">
@@ -42,11 +39,11 @@ SPDX-License-Identifier: GPL-2.0-or-later
                     <li>
                         {% if request.user.is_authenticated %}
                             <a href="{% url 'logout' %}">
-                                <span class="glyphicon glyphicon-log-out"></span> Logout
+                                <span class="glyphicon glyphicon-log-out"></span> Se déconnecter
                             </a>
                         {% else %}
                             <a href="{% url 'login' %}">
-                                <span class="glyphicon glyphicon-log-in"></span> Login
+                                <span class="glyphicon glyphicon-log-in"></span> Se connecter
                             </a>
                         {% endif %}
                     </li>
@@ -55,54 +52,18 @@ SPDX-License-Identifier: GPL-2.0-or-later
         </div>
     </nav>
 
-    <div id="main" class="container-fluid text-center">
-        <div class="row content">
-            <div class="col-sm-2 sidenav"></div>
-            <div class="col-sm-8 text-left">
-                {# Display django.contrib.messages as Bootstrap alerts #}
-                {% bootstrap_messages %}
+    <div id="main" class="container pt-4">
+        {# Display django.contrib.messages as Bootstrap alerts #}
+        {% bootstrap_messages %}
 
-                {% block content %}{% endblock %}
-            </div>
-            <div class="col-sm-2 sidenav">
-                <div class="panel panel-default">
-                    {% if request_user.is_authenticated %}
-                        <div class="panel-heading">
-                            <h4>{{ request_user.name }} {{ request_user.surname }}</h4>
-                        </div>
-                        <table class="table">
-                            <tr>
-                                <th scope="row">Pseudo</th>
-                                <td class="text-right">{{ request_user.pseudo }}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Nom</th>
-                                <td class="text-right">{{ request_user.surname }}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Prénom</th>
-                                <td class="text-right">{{ request_user.name }}</td>
-                            </tr>
-                        </table>
-                    {% else %}
-                        <div class="panel-body">
-                            <p>Vous n'êtes pas authentifié</p>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+        {% block content %}{% endblock %}
     </div>
 </div>
 
-<footer class="navbar">
-    <div class="containerfluid text-center">
-        <p>Re2o 2016 - Gabriel Détraz, <a href="https://gitlab.rezometz.org/lhark">Goulven Kermarec</a>, Augustin
-            Lemesle</p>
+<footer class="navbar navbar-default">
+    <div class="container">
+        <p>Portail captif 2016-2019 &mdash; Gabriel Détraz, Goulven Kermarec, Augustin Lemesle</p>
     </div>
 </footer>
-
-
-{# Read the documentation for more information #}
 </body>
 </html>
