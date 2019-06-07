@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% comment %}
+SPDX-License-Identifier: GPL-2.0-or-later
+{% endcomment %}
+
+{% load bootstrap3 %}
+
+{% block title %}Profil{% endblock %}
+
+{% block content %}
+    <h2>Compte</h2>
+    <div>
+        <a class="btn btn-primary btn-sm" role="button" href="{% url 'users:edit-info' user.id %}">
+            <i class="glyphicon glyphicon-edit"></i>
+            Editer
+        </a>
+        <a class="btn btn-primary btn-sm" role="button" href="{% url 'users:password' user.id %}">
+            <i class="glyphicon glyphicon-lock"></i>
+            Changer le mot de passe
+        </a>
+    </div>
+    <hr/>
+    <dl class="dl-horizontal row profile-info">
+        <div class="col-md-6"><dt>Prénom</dt><dd>{{ user.name }}</dd></div>
+        <div class="col-md-6"><dt>Nom</dt><dd>{{ user.surname }}</dd></div>
+        <div class="col-md-6"><dt>Pseudo</dt><dd>{{ user.pseudo }}</dd></div>
+        <div class="col-md-6"><dt>E-mail</dt><dd>{{ user.email }}</dd></div>
+        <div class="col-md-6"><dt>Commentaire</dt><dd>{{ user.comment }}</dd></div>
+        <div class="col-md-6"><dt>Date d'inscription</dt><dd>{{ user.registered }}</dd></div>
+        <div class="col-md-6"><dt>Dernière connexion</dt><dd>{{ user.last_login }}</dd></div>
+        <div class="col-md-6">
+            <dt>Statut</dt>
+            {% if users.state == 0 %}
+                <dd><i class="text-success">Actif</i></dd>
+            {% elif users.state == 1 %}
+                <dd><i class="text-danger">Désactivé</i></dd>
+            {% elif users.state == 2 %}
+                <dd><i class="text-warning">Archivé</i></dd>
+            {% endif %}
+        </div>
+    </dl>
+
+    <h2>Machines enregistrées</h2>
+    <a class="btn btn-primary btn-sm" role="button" href="{% url 'users:capture' %}">
+        <i class="glyphicon glyphicon-flash"></i>
+        Enregistrer la machine utilisée actuellement
+    </a>
+    <ul>
+        {% for machine in machines_list %}
+            <li>{{ machine.mac_address }}</li>
+            {# TODO date d'ajout #}
+        {% endfor %}
+    </ul>
+{% endblock %}

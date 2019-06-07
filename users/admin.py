@@ -58,6 +58,9 @@ class UserAdmin(VersionAdmin, BaseUserAdmin):
     ordering = ('pseudo',)
     filter_horizontal = ()
 
+    # TODO(erdnaxe): édition date inscription, dernière co, commentaire, statut
+    # changement mdp
+
 
 admin.site.register(Machine, MachineAdmin)
 admin.site.register(User, UserAdmin)

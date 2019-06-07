@@ -4,10 +4,9 @@
 import ipaddress
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.signals import user_logged_in
 from django.core.mail import send_mail
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.shortcuts import get_object_or_404, render, redirect
@@ -15,12 +14,11 @@ from django.template import Context, loader
 from django.template.context_processors import csrf
 from django.utils import timezone
 from reversion import revisions as reversion
-from reversion.models import Version
 
 from portail_captif.settings import REQ_EXPIRE_STR, EMAIL_FROM, ASSO_NAME, \
-    ASSO_EMAIL, SITE_NAME, CAPTIVE_IP_RANGE, CAPTIVE_WIFI, PAGINATION_NUMBER
+    ASSO_EMAIL, SITE_NAME, CAPTIVE_IP_RANGE, CAPTIVE_WIFI
 from users.forms import PassForm, ResetPasswordForm
-from users.models import InfoForm, BaseInfoForm, Machine, StateForm, mac_from_ip
+from users.models import InfoForm, BaseInfoForm, Machine, mac_from_ip
 from users.models import User, Request
 
 
@@ -43,7 +41,7 @@ def password_change_action(u_form, user, request, req=False):
     if req:
         req.delete()
         return redirect("/")
-    return redirect("/users/profil/" + str(user.id))
+    return redirect("/users/")
 
 
 def reset_passwd_mail(req, request):
@@ -79,7 +77,7 @@ def new_user(request):
         messages.success(request,
                          "L'utilisateur %s a été créé, un mail pour l'initialisation du mot de passe a été envoyé" % user.pseudo)
         capture_mac(request, user)
-        return redirect("/users/profil/" + str(user.id))
+        return redirect("/users/" + str(user.id))
     return form({'userform': user}, 'users/user.html', request)
 
 
@@ -94,7 +92,7 @@ def edit_info(request, userid):
     if not request.user.is_admin and user != request.user:
         messages.error(request,
                        "Vous ne pouvez pas modifier un autre user que vous sans droit admin")
-        return redirect("/users/profil/" + str(request.user.id))
+        return redirect("/users/")
     if not request.user.is_admin:
         user = BaseInfoForm(request.POST or None, instance=user)
     else:
@@ -106,29 +104,8 @@ def edit_info(request, userid):
             reversion.set_comment("Champs modifié(s) : %s" % ', '.join(
                 field for field in user.changed_data))
         messages.success(request, "L'user a bien été modifié")
-        return redirect("/users/profil/" + userid)
-    return form({'userform': user}, 'users/user.html', request)
-
-
-@login_required
-@permission_required('admin')
-def state(request, userid):
-    """ Changer l'etat actif/desactivé/archivé d'un user, need droit bureau """
-    try:
-        user = User.objects.get(pk=userid)
-    except User.DoesNotExist:
-        messages.error(request, "Utilisateur inexistant")
         return redirect("/users/")
-    state = StateForm(request.POST or None, instance=user)
-    if state.is_valid():
-        with transaction.atomic(), reversion.create_revision():
-            state.save()
-            reversion.set_user(request.user)
-            reversion.set_comment("Champs modifié(s) : %s" % ', '.join(
-                field for field in state.changed_data))
-        messages.success(request, "Etat changé avec succès")
-        return redirect("/users/profil/" + userid)
-    return form({'userform': state}, 'users/user.html', request)
+    return form({'userform': user}, 'users/user.html', request)
 
 
 @login_required
@@ -144,7 +121,7 @@ def password(request, userid):
     if not request.user.is_admin and user != request.user:
         messages.error(request,
                        "Vous ne pouvez pas modifier un autre user que vous sans droit admin")
-        return redirect("/users/profil/" + str(request.user.id))
+        return redirect("/users/" + str(request.user.id))
     u_form = PassForm(request.POST or None)
     if u_form.is_valid():
         return password_change_action(u_form, user, request)
@@ -152,85 +129,20 @@ def password(request, userid):
 
 
 @login_required
-@permission_required('admin')
-def index(request):
-    """ Affiche l'ensemble des users, need droit admin """
-    users_list = User.objects.order_by('registered').reverse()
-    paginator = Paginator(users_list, PAGINATION_NUMBER)
-    page = request.GET.get('page')
+def profile(request):
+    """
+    Show logged in user profile
+    """
     try:
-        users_list = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        users_list = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        users_list = paginator.page(paginator.num_pages)
-    return render(request, 'users/index.html', {'users_list': users_list})
-
-
-@login_required
-def history(request, object, id):
-    """ Affichage de l'historique : (acl, argument)
-    user : self, userid"""
-    if object == 'user':
-        try:
-            object_instance = User.objects.get(pk=id)
-        except User.DoesNotExist:
-            messages.error(request, "Utilisateur inexistant")
-            return redirect("/users/")
-        if not request.user.is_admin and object_instance != request.user:
-            messages.error(request,
-                           "Vous ne pouvez pas afficher l'historique d'un autre user que vous sans droit admin")
-            return redirect("/users/profil/" + str(request.user.id))
-    elif object == 'machines':
-        try:
-            object_instance = Machine.objects.get(pk=id)
-        except User.DoesNotExist:
-            messages.error(request, "Machine inexistante")
-            return redirect("/users/")
-        if not request.user.is_admin and object_instance.proprio != request.user:
-            messages.error(request,
-                           "Vous ne pouvez pas afficher l'historique d'un autre user que vous sans droit admin")
-            return redirect("/users/profil/" + str(request.user.id))
-    else:
-        messages.error(request, "Objet  inconnu")
-        return redirect("/users/")
-    reversions = Version.objects.get_for_object(object_instance)
-    paginator = Paginator(reversions, PAGINATION_NUMBER)
-    page = request.GET.get('page')
-    try:
-        reversions = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        reversions = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        reversions = paginator.page(paginator.num_pages)
-    return render(request, 'portail_captif/history.html',
-                  {'reversions': reversions, 'object': object_instance})
-
-
-@login_required
-def mon_profil(request):
-    return redirect("/users/profil/" + str(request.user.id))
-
-
-@login_required
-def profil(request, userid):
-    try:
-        users = User.objects.get(pk=userid)
+        users = User.objects.get(pk=request.user.id)
     except User.DoesNotExist:
-        messages.error(request, "Utilisateur inexistant")
-        return redirect("/users/")
+        messages.error(request, "Your user doesn't exist")
+        return redirect("/")
     machines_list = Machine.objects.filter(proprio=users)
-    if not request.user.is_admin and users != request.user:
-        messages.error(request,
-                       "Vous ne pouvez pas afficher un autre user que vous sans droit admin")
-        return redirect("/users/profil/" + str(request.user.id))
+
     return render(
         request,
-        'users/profil.html',
+        'users/profile.html',
         {
             'user': users,
             'machines_list': machines_list,
@@ -294,7 +206,7 @@ def capture(request):
         messages.error(request, "Utilisateur inexistant")
         return redirect("/users/")
     capture_mac(request, users)
-    return redirect("/users/profil/" + str(users.id))
+    return redirect("/users/")
 
 
 def reset_password(request):
@@ -323,8 +235,6 @@ def process(request, token):
 
     if req.type == Request.PASSWD:
         return process_passwd(request, req)
-    elif req.type == Request.EMAIL:
-        return process_email(request, req=req)
     else:
         messages.error(request, "Entrée incorrecte, contactez un admin")
         redirect("/")
