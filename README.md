@@ -1,80 +1,73 @@
-# Portail captif
+# Portail captif Cr@ns
 
-Gnu public license v2.0
+Ce portail minimaliste permet aux utilisateurs de s'identifier sur un HotSpot WiFi.
 
-## Avant propos 
+Leurs adresses MAC sont capturées, et injectée dans une ipset
+qui leur donne accès à internet.
 
-Ce projet est forké à partir de re2o  (https://gitlab.rezometz.org/rezo/re2o).
-Ce portail minimaliste permet aux utilisateurs de s'identifier. Leurs mac sont capturées, et injectée dans une ipset qui leur donne accès à internet.
+## Histoire
 
-#Installation
+Ce projet a initialement été forké à partir de [re2o](https://gitlab.federez.net/federez/re2o) par [chirac](https://gitlab.crans.org/detraz).
 
-## Installation des dépendances
+Il a été repris en 2019 par [erdnaxe](https://gitlab.crans.org/erdnaxe) pour l'améliorer.
 
-L'installation comporte 2 parties : le serveur web où se trouve le depot portail_captif ainsi que toutes ses dépendances, et le serveur bdd (mysql ou pgsql). Ces 2 serveurs peuvent en réalité être la même machine, ou séparés (recommandé en production).
-Le serveur web sera nommé serveur A, le serveur bdd serveur B .
+# Installation
 
-### Prérequis sur le serveur A
+Il peut être souhaitable d'installer la base de données sur un serveur
+séparé du serveur web en production.
 
-Voici la liste des dépendances à installer sur le serveur principal (A).
+## Installation du serveur web
 
-### Avec apt :
+On installe les dépendances par APT :
 
-#### Sous debian 8
-Paquets obligatoires:
- * python3-django (1.8, jessie-backports)
- * python3-dateutil (jessie-backports)
- * python3-django-reversion (stretch)
- * python3-pip (jessie)
+```bash
+apt install python3-django python3-dateutil python3-django-reversion python3-pip
+```
 
-Avec pip3 :
- * django-bootstrap3
- * django-macaddress
+Ensuite on installe les dépendances restantes avec pip :
 
-Paquet recommandés:
- * python3-django-extensions (jessie)
+```bash
+pip3 install django-bootstrap3 django-macaddress
+```
 
-Moteur de db conseillé (mysql), postgresql fonctionne également.
-Pour mysql, il faut installer : 
- * python3-mysqldb (jessie-backports)
- * mysql-client
+On clone le projet dans `/var/www/portail_captif` par exemple.
 
-Postgresql :
- * psycopg2
+Ensuite, il faut créer le fichier settings_local.py dans le sous dossier portail_captif,
+un settings_local.example.py est présent.
+En particulier, il est nécessaire de générer des identifiants pour le ldap
+et des identifiants pour le sql (cf ci-dessous), à mettre dans settings_local.py
 
-### Prérequis sur le serveur B
+## Installation de la base de données
 
-Sur le serveur B, installer mysql ou postgresql, dans la version jessie ou stretch.
- * mysql-server (jessie/stretch) ou postgresql (jessie-stretch)
+### Pour PostgreSQL
 
-### Installation sur le serveur principal A
+On installe `psycopg2` sur le serveur web.
 
-Cloner le dépot portail_captif à partir du gitlab, par exemple dans /var/www/portail_captif.
-Ensuite, il faut créer le fichier settings_local.py dans le sous dossier portail_captif, un settings_local.example.py est présent. Les options sont commentées, et des options par défaut existent.
+Puis on installe `postgresql` sur le serveur de base de données et on le configure.
 
-En particulier, il est nécessaire de générer un login/mdp admin pour le ldap et un login/mdp pour l'utilisateur sql (cf ci-dessous), à mettre dans settings_local.py
+### Pour MySQL
 
-### Installation du serveur mysql/postgresql sur B
+On installe `python3-mysqldb` et `mysql-client sur le serveur web.
 
-Sur le serveur mysql ou postgresl, il est nécessaire de créer une base de donnée portail_captif, ainsi qu'un user portail_captif et un mot de passe associé. Ne pas oublier de faire écouter le serveur mysql ou postgresql avec les acl nécessaire pour que A puisse l'utiliser.
+Puis on installe `mysql-server` sur le serveur de base de données et on le configure.
 
-Voici les étapes à éxecuter pour mysql :
- * CREATE DATABASE portail_captif;
- * CREATE USER 'newuser'@'localhost' IDENTIFIED BY 'password';
- * GRANT ALL PRIVILEGES ON portail_captif.* TO 'newuser'@'localhost';
- * FLUSH PRIVILEGES;
+On crée la base de données et un utilisateur,
 
-Si les serveurs A et B ne sont pas la même machine, il est nécessaire de remplacer localhost par l'ip avec laquelle A contacte B dans les commandes du dessus.
-Une fois ces commandes effectuées, ne pas oublier de vérifier que newuser et password sont présents dans settings_local.py
+```SQL
+CREATE DATABASE portail_captif;
+CREATE USER 'newuser'@'localhost' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON portail_captif.* TO 'newuser'@'localhost';
+FLUSH PRIVILEGES;
+```
 
-## Configuration initiale
+### Configuration initiale
 
 Normalement à cette étape, le ldap et la bdd sql sont configurées correctement.
 
-Il faut alors lancer dans le dépot portail_captif '''python3 manage.py migrate''' qui va structurer initialement la base de données.
-Les migrations sont normalement comitées au fur et à mesure, néanmoins cette étape peut crasher, merci de reporter les bugs.
+Il faut alors lancer dans le dépot portail_captif
+'''python3 manage.py migrate''' qui va migrer la base de données.
 
-## Démarer le site web
+#### Démarrer le site web
 
 Il faut utiliser un moteur pour servir le site web. Nginx ou apache2 sont recommandés.
 Pour apache2 :
@@ -89,17 +82,8 @@ Pour nginx :
 
 Utilisez alors un site nginx qui proxifie vers une socket gunicorn. Ensuite, utilisez les fichier portail_captif.service et portail_captif.socket avec systemd pour lancer le sous process gunicorn, présents dans portail_captif/ . 
 
-## Configuration avancée
+## Licence
 
-Une fois démaré, le site web devrait être accessible. 
-Pour créer un premier user, faire '''python3 manage.py createsuperuser''' qui va alors créer un user admin.
-Il est conseillé de créer alors les droits cableur, bureau, trésorier et infra, qui n'existent pas par défaut dans le menu adhérents.
-Il est également conseillé de créer un user portant le nom de l'association/organisation, qui possedera l'ensemble des machines.
-
-# Requète en base de donnée
-
-Pour avoir un shell, il suffit de lancer '''python3 manage.py shell'''
-Pour charger des objets, example avec User, faire : ''' from users.models import User'''
-Pour charger les objets django, il suffit de faire User.objects.all() pour tous les users par exemple. 
-Il est ensuite aisé de faire des requètes, par exemple User.objects.filter(pseudo='test')
-Des exemples et la documentation complète sur les requètes django sont disponible sur le site officiel.
+Ce projet est sous [licence GPL](LICENSE) parce que l'on croît au développement ouvert.
+La licence GPL implique des droits et des devoirs.
+Veuillez vous référer au fichier de licence pour plus d'informations.
