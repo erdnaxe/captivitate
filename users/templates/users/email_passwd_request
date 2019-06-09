@@ -1,7 +1,7 @@
 Bonjour {{ name }},
 
 Vous trouverez ci-dessous une url permetant d'initialiser ou de reinitialiser votre
-compte {{ site_name }}. Celui-ci vous permet de gérer l'ensemble de vos équipements
+compte {{ request.site.name }}. Celui-ci vous permet de gérer l'ensemble de vos équipements
 connectés, votre compte, et les services proposés par le {{ asso }}.
 
     {{ url }}

@@ -8,7 +8,7 @@ SPDX-License-Identifier: GPL-2.0-or-later
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <title>{{ site_name }} : {% block title %}Accueil{% endblock %}</title>
+    <title>{{ request.site.name }} : {% block title %}Accueil{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     {% bootstrap_css %}
@@ -26,7 +26,7 @@ SPDX-License-Identifier: GPL-2.0-or-later
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="/">{{ site_name }}</a>
+                <a class="navbar-brand" href="/">{{ request.site.name }}</a>
             </div>
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav navbar-right">

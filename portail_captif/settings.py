@@ -1,21 +1,20 @@
 # -*- mode: python; coding: utf-8 -*-
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 
 from .settings_local import *
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
-
 # Auth definition
 
 PASSWORD_HASHERS = (
-    'portail_captif.login.SSHAPasswordHasher',
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+    'portail_captif.login.SSHAPasswordHasher',
 )
 
 AUTH_USER_MODEL = 'users.User'
@@ -31,15 +30,16 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'bootstrap3',
     'users',
-    'portail_captif',
     'reversion',
     'django_prometheus'
 )
 
 MIDDLEWARE_CLASSES = (
     'django_prometheus.middleware.PrometheusBeforeMiddleware',
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -47,9 +47,11 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sites.middleware.CurrentSiteMiddleware',
     'django_prometheus.middleware.PrometheusAfterMiddleware',
 )
+# 'django.contrib.admindocs.middleware.XViewMiddleware',
+# 'django.middleware.locale.LocaleMiddleware',
 
 ROOT_URLCONF = 'portail_captif.urls'
 
@@ -66,8 +68,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'django.template.context_processors.request',
-                'portail_captif.context_processors.context_user',
             ],
         },
     },
@@ -79,13 +79,9 @@ WSGI_APPLICATION = 'portail_captif.wsgi.application'
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
 LANGUAGE_CODE = 'fr-fr'
-
 TIME_ZONE = 'Europe/Paris'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 # django-bootstrap3 config dictionnary
@@ -97,19 +93,15 @@ BOOTSTRAP3 = {
 
 BOOTSTRAP_BASE_URL = '/static/bootstrap/'
 
+# Static files
 STATICFILES_DIRS = (
-    # Put strings here, like "/home/html/static" or "C:/www/django/static".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-    os.path.join(
-        BASE_DIR,
-        'static',
-    ),
+    os.path.join(BASE_DIR, 'static'),
 )
-
 STATIC_URL = '/static/'
-
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_files')
+
+# Django sites
+SITE_ID = 1
 
 PAGINATION_NUMBER = 25
 
