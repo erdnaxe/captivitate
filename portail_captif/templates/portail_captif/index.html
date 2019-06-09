@@ -2,6 +2,7 @@
 {% comment %}
 SPDX-License-Identifier: GPL-2.0-or-later
 {% endcomment %}
+{# This page is shown when user is not logged in #}
 
 {% load bootstrap3 %}
 {% load staticfiles %}
@@ -16,11 +17,9 @@ SPDX-License-Identifier: GPL-2.0-or-later
         durant ton passage.
     </p>
 
-    <center>
-        <div class="thumbnail">
-            <a href="https://crans.org"><img src="/static/logo/logo.png" alt="logo"></a>
-        </div>
-    </center>
+    <div class="thumbnail">
+        <img src="{% static "/logo/logo.png" %}" alt="Cr@ns">
+    </div>
 
     <div class="row">
         <div class="col-sm-6 col-md-6">
