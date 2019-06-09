@@ -20,22 +20,44 @@ SPDX-License-Identifier: GPL-2.0-or-later
         </a>
     </div>
     <dl class="dl-horizontal row profile-info pt4">
-        <div class="col-md-6"><dt>Prénom</dt><dd>{{ user.name }}</dd></div>
-        <div class="col-md-6"><dt>Nom</dt><dd>{{ user.surname }}</dd></div>
-        <div class="col-md-6"><dt>Pseudo</dt><dd>{{ user.pseudo }}</dd></div>
-        <div class="col-md-6"><dt>E-mail</dt><dd>{{ user.email }}</dd></div>
-        <div class="col-md-6"><dt>Commentaire</dt><dd>{{ user.comment }}</dd></div>
-        <div class="col-md-6"><dt>Date d'inscription</dt><dd>{{ user.registered }}</dd></div>
-        <div class="col-md-6"><dt>Dernière connexion</dt><dd>{{ user.last_login }}</dd></div>
+        <div class="col-md-6">
+            <dt>Prénom</dt>
+            <dd>{{ user.name }}</dd>
+        </div>
+        <div class="col-md-6">
+            <dt>Nom</dt>
+            <dd>{{ user.surname }}</dd>
+        </div>
+        <div class="col-md-6">
+            <dt>Pseudo</dt>
+            <dd>{{ user.pseudo }}</dd>
+        </div>
+        <div class="col-md-6">
+            <dt>E-mail</dt>
+            <dd>{{ user.email }}</dd>
+        </div>
+        <div class="col-md-6">
+            <dt>Commentaire</dt>
+            <dd>{{ user.comment }}</dd>
+        </div>
+        <div class="col-md-6">
+            <dt>Date d'inscription</dt>
+            <dd>{{ user.registered }}</dd>
+        </div>
+        <div class="col-md-6">
+            <dt>Dernière connexion</dt>
+            <dd>{{ user.last_login }}</dd>
+        </div>
         <div class="col-md-6">
             <dt>Statut</dt>
-            {% if users.state == 0 %}
-                <dd><i class="text-success">Actif</i></dd>
-            {% elif users.state == 1 %}
-                <dd><i class="text-danger">Désactivé</i></dd>
-            {% elif users.state == 2 %}
-                <dd><i class="text-warning">Archivé</i></dd>
+            <dd>{% if user.state == 0 %}
+                <i class="text-success">Actif</i>
+            {% elif user.state == 1 %}
+                <i class="text-danger">Désactivé</i>
+            {% elif user.state == 2 %}
+                <i class="text-warning">Archivé</i>
             {% endif %}
+            </dd>
         </div>
     </dl>
 
