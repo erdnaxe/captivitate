@@ -19,8 +19,7 @@ SPDX-License-Identifier: GPL-2.0-or-later
             Changer le mot de passe
         </a>
     </div>
-    <hr/>
-    <dl class="dl-horizontal row profile-info">
+    <dl class="dl-horizontal row profile-info pt4">
         <div class="col-md-6"><dt>Prénom</dt><dd>{{ user.name }}</dd></div>
         <div class="col-md-6"><dt>Nom</dt><dd>{{ user.surname }}</dd></div>
         <div class="col-md-6"><dt>Pseudo</dt><dd>{{ user.pseudo }}</dd></div>
@@ -45,7 +44,7 @@ SPDX-License-Identifier: GPL-2.0-or-later
         <i class="glyphicon glyphicon-flash"></i>
         Enregistrer la machine utilisée actuellement
     </a>
-    <ul>
+    <ul class="pt4">
         {% for machine in machines_list %}
             <li>{{ machine.mac_address }}</li>
             {# TODO date d'ajout #}

@@ -4,7 +4,7 @@ html, body {
 }
 
 .pt4 {
-    padding-top: 1.5rem!important;
+    padding-top: 1.5rem !important;
 }
 
 #wrap {
@@ -13,22 +13,14 @@ html, body {
 
 #main {
     overflow: auto;
-    padding-bottom:60px; /* this needs to be bigger than footer height*/
+    padding-bottom: 60px; /* this needs to be bigger than footer height*/
 }
 
 footer {
-    position: relative;
     margin-top: -50px; /* negative value of footer height */
     height: 50px;
-    clear:both;
-    padding-top:20px;
-    background-color: #222222;
+    clear: both;
     padding: 15px;
-}
-
-footer a {
-    color: white;
-    text-decoration: underline;
 }
 
 /* Remove the navbar's default margin-bottom and rounded borders */
@@ -43,33 +35,15 @@ footer a {
     overflow: auto;
 }
 
-/* Set gray background color and 100% height */
-.sidenav {
-    padding-top: 20px;
-    background-color: #f1f1f1;
-}
-.table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
-    vertical-align: middle;
-}
-
-/* Pull sidebars to the bottom */
-@media (min-width: 767px) {
-    .row {
-        display: -webkit-box;
-        display: -webkit-flex;
-        display: -ms-flexbox;
-        display:         flex;
-    }
-    .row > [class*='col-'] {
-        flex-direction: column;
-    }
-}
-
 /* On small screens, set height to 'auto' for sidenav and grid */
 @media screen and (max-width: 767px) {
-    .sidenav {
+    .row.content {
         height: auto;
-        padding: 15px;
     }
-    .row.content {height:auto;}
+}
+
+/* Detailed information on profile page */
+dl.profile-info > div {
+    padding: 8px;
+    border-top: 1px solid #ddd;
 }

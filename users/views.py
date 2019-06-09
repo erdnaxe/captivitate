@@ -77,7 +77,7 @@ def new_user(request):
         messages.success(request,
                          "L'utilisateur %s a été créé, un mail pour l'initialisation du mot de passe a été envoyé" % user.pseudo)
         capture_mac(request, user)
-        return redirect("/users/" + str(user.id))
+        return redirect("/")
     return form({'userform': user}, 'users/user.html', request)
 
 
