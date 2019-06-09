@@ -9,6 +9,7 @@ from django.contrib.auth.signals import user_logged_in
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.db import transaction
+from django.http import Http404
 from django.shortcuts import get_object_or_404, render, redirect
 from django.template import Context, loader
 from django.template.context_processors import csrf
@@ -23,9 +24,30 @@ from users.models import User, Request
 
 
 def form(ctx, template, request):
-    c = ctx
-    c.update(csrf(request))
-    return render(request, template, c)
+    ctx.update(csrf(request))
+    return render(request, template, ctx)
+
+
+def index(request):
+    """
+    Show logged in user profile or index page
+    """
+    if request.user.is_authenticated():
+        try:
+            users = User.objects.get(pk=request.user.id)
+        except User.DoesNotExist:
+            raise Http404
+        machines_list = Machine.objects.filter(proprio=users)
+        return render(
+            request,
+            'users/profile.html',
+            {
+                'user': users,
+                'machines_list': machines_list,
+            }
+        )
+    else:
+        return form({}, 'users/index.html', request)
 
 
 def password_change_action(u_form, user, request, req=False):
@@ -41,7 +63,7 @@ def password_change_action(u_form, user, request, req=False):
     if req:
         req.delete()
         return redirect("/")
-    return redirect("/users/")
+    return redirect("/")
 
 
 def reset_passwd_mail(req, request):
@@ -88,11 +110,11 @@ def edit_info(request, userid):
         user = User.objects.get(pk=userid)
     except User.DoesNotExist:
         messages.error(request, "Utilisateur inexistant")
-        return redirect("/users/")
+        return redirect("/")
     if not request.user.is_admin and user != request.user:
         messages.error(request,
                        "Vous ne pouvez pas modifier un autre user que vous sans droit admin")
-        return redirect("/users/")
+        return redirect("/")
     if not request.user.is_admin:
         user = BaseInfoForm(request.POST or None, instance=user)
     else:
@@ -104,7 +126,7 @@ def edit_info(request, userid):
             reversion.set_comment("Champs modifié(s) : %s" % ', '.join(
                 field for field in user.changed_data))
         messages.success(request, "L'user a bien été modifié")
-        return redirect("/users/")
+        return redirect("/")
     return form({'userform': user}, 'users/user.html', request)
 
 
@@ -117,37 +139,15 @@ def password(request, userid):
         user = User.objects.get(pk=userid)
     except User.DoesNotExist:
         messages.error(request, "Utilisateur inexistant")
-        return redirect("/users/")
+        return redirect("/")
     if not request.user.is_admin and user != request.user:
         messages.error(request,
                        "Vous ne pouvez pas modifier un autre user que vous sans droit admin")
-        return redirect("/users/" + str(request.user.id))
+        return redirect("/" + str(request.user.id))
     u_form = PassForm(request.POST or None)
     if u_form.is_valid():
         return password_change_action(u_form, user, request)
     return form({'userform': u_form}, 'users/user.html', request)
-
-
-@login_required
-def profile(request):
-    """
-    Show logged in user profile
-    """
-    try:
-        users = User.objects.get(pk=request.user.id)
-    except User.DoesNotExist:
-        messages.error(request, "Your user doesn't exist")
-        return redirect("/")
-    machines_list = Machine.objects.filter(proprio=users)
-
-    return render(
-        request,
-        'users/profile.html',
-        {
-            'user': users,
-            'machines_list': machines_list,
-        }
-    )
 
 
 def get_ip(request):
@@ -203,10 +203,9 @@ def capture(request):
     try:
         users = User.objects.get(pk=userid)
     except User.DoesNotExist:
-        messages.error(request, "Utilisateur inexistant")
-        return redirect("/users/")
+        raise Http404
     capture_mac(request, users)
-    return redirect("/users/")
+    return redirect("/")
 
 
 def reset_password(request):

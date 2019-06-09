@@ -1,6 +1,10 @@
 # -*- mode: python; coding: utf-8 -*-
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 SECRET_KEY = 'SUPER_SECRET'
 
 DB_PASSWORD = 'SUPER_SECRET'
@@ -17,12 +21,16 @@ ALLOWED_HOSTS = ['test.example.org']
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'portail_captif',
-        'USER': 'portail_captif',
-        'PASSWORD': DB_PASSWORD,
-        'HOST': 'localhost',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     },
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'NAME': 'portail_captif',
+    #     'USER': 'portail_captif',
+    #     'PASSWORD': DB_PASSWORD,
+    #     'HOST': 'localhost',
+    # },
 }
 
 # Security settings
@@ -36,20 +44,13 @@ SESSION_COOKIE_AGE = 60 * 60 * 3
 
 # Association information
 
-SITE_NAME = "Portail-captif"
+SITE_NAME = "Portail captif"
 
 ASSO_NAME = "Asso reseau"
 ASSO_EMAIL = "tresorier@ecole.fr"
 
-services_urls = {
-    # Fill IT  : ex :  'gitlab': {
-    #                           'url': 'https://gitlab.rezometz.org',
-    #                           'logo': 'gitlab.png',
-    #                           'description': 'Gitlab is cool 8-)'},
-}
-
-# Number of hours a token remains valid after having been created.  Numeric and string
-# versions should have the same meaning.
+# Number of hours a token remains valid after having been created.
+# Numeric and string versions should have the same meaning.
 REQ_EXPIRE_HRS = 48
 REQ_EXPIRE_STR = '48 heures'
 
@@ -58,31 +59,32 @@ EMAIL_FROM = 'www-data@example.org'
 
 EMAIL_HOST = 'smtp.example.org'
 
-# Affchage des résultats
-SEARCH_RESULT = 15
-
-#### Réglages du portail
-
 # Path de la commande ipset
 GENERIC_IPSET_COMMAND = "/sbin/ipset"
 
 # Nom de l'ipset utilisé
 IPSET_NAME = "portail_captif"
 
-### Interfaces où la sortie est interdite (ex vlan admin)
+# Interfaces où la sortie est interdite (ex vlan admin)
 FORBIDEN_INTERFACES = ["ens19"]
 
-### Ip où le trafic est redirigé
+# Ip où le trafic est redirigé
 SERVER_SELF_IP = "192.168.0.1"
 
-### Interfaces autorisées au routage
-AUTORIZED_INTERFACES = ["ens18", "ens20"]
+# Interfaces autorisées au routage
+OUT_INTERFACE = "ens21"
 
-### Activation du portail obligatoire (redirection)
+# Interface Interne
+INTERNAL_INTERFACE = "ens20"
+
+# Interfaces autorisées au routage
+AUTORIZED_INTERFACES = [INTERNAL_INTERFACE] + [OUT_INTERFACE]
+
+# Activation du portail obligatoire (redirection)
 PORTAIL_ACTIVE = True
 
-## Range ip du portail captif
+# Range ip du portail captif
 CAPTIVE_IP_RANGE = "192.168.0.0/24"
 
-## SSID du wifi portaul captif
+# SSID du wifi portail captif
 CAPTIVE_WIFI = "Install-party"

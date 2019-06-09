@@ -290,13 +290,13 @@ class Machine(ExportModelOperationsMixin('machine'), models.Model):
 
 
 @receiver(post_save, sender=Machine)
-def machine_post_save(sender, **kwargs):
+def machine_post_save(**kwargs):
     machine = kwargs['instance']
     machine.add_to_set()
 
 
 @receiver(post_delete, sender=Machine)
-def machine_post_delete(sender, **kwargs):
+def machine_post_delete(**kwargs):
     machine = kwargs['instance']
     machine.del_to_set()
 

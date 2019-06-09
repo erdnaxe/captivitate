@@ -30,7 +30,6 @@ SPDX-License-Identifier: GPL-2.0-or-later
             </div>
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="{% url "users:profile" %}">Mon profil</a></li>
                     {% if user.is_staff %}
                         <li><a href="{% url "admin:index" %}">Administration</a></li>
                     {% endif %}

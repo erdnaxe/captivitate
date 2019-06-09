@@ -7,14 +7,13 @@ from django.contrib.auth import views as auth_views
 from django.views.generic.base import RedirectView
 from django_prometheus import exports
 
-from .views import index
-
 urlpatterns = [
-    url(r'^$', index),
-    url('^logout/', auth_views.logout, {'next_page': '/'}),
-    url('^', include('django.contrib.auth.urls')),
+    url(r'^logout/', auth_views.logout, {'next_page': '/'}),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^users/', include('users.urls', namespace='users')),
+    url(r'^', include('django.contrib.auth.urls')),
+    url(r'^', include('users.urls')),
+
+    # Prometheus metrics
     url(r'^metrics$', exports.ExportToDjangoView,
         name='prometheus-django-metrics'),
 
