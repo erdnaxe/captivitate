@@ -11,16 +11,16 @@ from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render, redirect
-from django.template import Context, loader
+from django.template import loader
 from django.template.context_processors import csrf
 from django.utils import timezone
 from reversion import revisions as reversion
 
-from portail_captif.settings import REQ_EXPIRE_STR, EMAIL_FROM, ASSO_NAME, \
-    ASSO_EMAIL, SITE_NAME, CAPTIVE_IP_RANGE, CAPTIVE_WIFI
-from users.forms import PassForm, ResetPasswordForm
-from users.models import InfoForm, BaseInfoForm, Machine, mac_from_ip
-from users.models import User, Request
+from portail_captif.settings import REQ_EXPIRE_STR, DEFAULT_FROM_EMAIL, \
+    ASSO_NAME, ASSO_EMAIL, SITE_NAME, CAPTIVE_IP_RANGE, CAPTIVE_WIFI
+from users.forms import PassForm, ResetPasswordForm, InfoForm, BaseInfoForm
+from users.models import User, Request, Machine
+from users.tools import mac_from_ip
 
 
 def form(ctx, template, request):
@@ -69,7 +69,7 @@ def password_change_action(u_form, user, request, req=False):
 def reset_passwd_mail(req, request):
     """ Prend en argument un request, envoie un mail de réinitialisation de mot de pass """
     t = loader.get_template('users/email_passwd_request')
-    c = Context({
+    c = {
         'name': str(req.user.name) + ' ' + str(req.user.surname),
         'asso': ASSO_NAME,
         'asso_mail': ASSO_EMAIL,
@@ -77,9 +77,9 @@ def reset_passwd_mail(req, request):
         'url': request.build_absolute_uri(
             reverse('users:process', kwargs={'token': req.token})),
         'expire_in': REQ_EXPIRE_STR,
-    })
+    }
     send_mail('Votre compte %s' % SITE_NAME, t.render(c),
-              EMAIL_FROM, [req.user.email], fail_silently=False)
+              DEFAULT_FROM_EMAIL, [req.user.email], fail_silently=False)
     return
 
 

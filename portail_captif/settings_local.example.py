@@ -14,8 +14,6 @@ DEBUG = False
 
 ADMINS = [('Example', 'rezo-admin@example.org')]
 
-SERVER_EMAIL = 'no-reply@example.org'
-
 # Obligatoire, liste des host autorisés
 ALLOWED_HOSTS = ['test.example.org']
 
@@ -32,6 +30,17 @@ DATABASES = {
     #     'HOST': 'localhost',
     # },
 }
+
+# Emails
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_USE_SSL = False
+# EMAIL_HOST = 'smtp.example.org'
+# EMAIL_PORT = 25
+# EMAIL_HOST_USER = 'change_me'
+# EMAIL_HOST_PASSWORD = 'change_me'
+DEFAULT_FROM_EMAIL = 'www-data@example.org'
+SERVER_EMAIL = 'no-reply@example.org'
 
 # Security settings
 SECURE_CONTENT_TYPE_NOSNIFF = True
@@ -53,11 +62,6 @@ ASSO_EMAIL = "tresorier@ecole.fr"
 # Numeric and string versions should have the same meaning.
 REQ_EXPIRE_HRS = 48
 REQ_EXPIRE_STR = '48 heures'
-
-# Email `From` field
-EMAIL_FROM = 'www-data@example.org'
-
-EMAIL_HOST = 'smtp.example.org'
 
 # Path de la commande ipset
 GENERIC_IPSET_COMMAND = "/sbin/ipset"

@@ -7,7 +7,8 @@
 from django.core.management.base import BaseCommand
 
 from portail_captif.settings import AUTORIZED_INTERFACES
-from users.models import restore_iptables, create_ip_set, fill_ipset, apply
+from users.models import fill_ipset
+from users.tools import restore_iptables, create_ip_set, apply
 
 
 class Command(BaseCommand):

@@ -4,6 +4,7 @@
 from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.validators import MinLengthValidator
+from django.forms import ModelForm
 
 from .models import User
 
@@ -94,3 +95,31 @@ class UserChangeForm(forms.ModelForm):
 class ResetPasswordForm(forms.Form):
     pseudo = forms.CharField(label=u'Pseudo', max_length=255)
     email = forms.EmailField(max_length=255)
+
+
+class BaseInfoForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['name'].label = 'Prénom'
+        self.fields['surname'].label = 'Nom'
+
+    class Meta:
+        model = User
+        fields = [
+            'name',
+            'pseudo',
+            'surname',
+            'email',
+        ]
+
+
+class InfoForm(BaseInfoForm):
+    class Meta(BaseInfoForm.Meta):
+        fields = [
+            'name',
+            'pseudo',
+            'comment',
+            'surname',
+            'email',
+            'admin',
+        ]

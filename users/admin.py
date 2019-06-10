@@ -10,29 +10,20 @@ from .forms import UserChangeForm, UserCreationForm
 from .models import User, Machine, Request
 
 
-class UserAdmin(admin.ModelAdmin):
-    list_display = (
-        'name',
-        'surname',
-        'pseudo',
-        'email',
-        'state'
-    )
-    search_fields = ('name', 'surname', 'pseudo')
-
-
 class RequestAdmin(admin.ModelAdmin):
     list_display = ('user', 'type', 'created_at', 'expires_at')
 
 
 class MachineAdmin(VersionAdmin):
     list_display = ('mac_address', 'proprio')
+    search_fields = ('mac_address', 'proprio__name')
 
 
 class UserAdmin(VersionAdmin, BaseUserAdmin):
     # The forms to add and change user instances
     form = UserChangeForm
     add_form = UserCreationForm
+    search_fields = ('name', 'surname', 'pseudo')
 
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
@@ -54,7 +45,6 @@ class UserAdmin(VersionAdmin, BaseUserAdmin):
                 'password2')}
          ),
     )
-    search_fields = ('pseudo',)
     ordering = ('pseudo',)
     filter_horizontal = ()
 
