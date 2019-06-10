@@ -10,6 +10,7 @@ from django.db import models
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 from macaddress.fields import MACAddressField
 
@@ -34,9 +35,8 @@ class UserManager(DjangoUserManager):
         return self._create_user(username, email, password, **extra_fields)
 
 
-class User(ExportModelOperationsMixin('user'), AbstractBaseUser):
-    # PermissionsMixin TODO
-    PRETTY_NAME = "Utilisateurs"
+class User(ExportModelOperationsMixin('user'), AbstractBaseUser,
+           PermissionsMixin):
     STATE_ACTIVE = 0
     STATE_DISABLED = 1
     STATE_ARCHIVE = 2
@@ -46,21 +46,34 @@ class User(ExportModelOperationsMixin('user'), AbstractBaseUser):
         (2, 'STATE_ARCHIVE'),
     )
 
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
-    email = models.EmailField()
+    username = models.CharField(
+        _('username'),
+        max_length=150,
+        unique=True,
+        help_text=_(
+            'Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.'),
+        validators=[],
+        error_messages={
+            'unique': _("A user with that username already exists."),
+        },
+    )
+    first_name = models.CharField(_('first name'), max_length=30, blank=True)
+    last_name = models.CharField(_('last name'), max_length=30, blank=True)
+    email = models.EmailField(_('email address'), blank=True)
     state = models.IntegerField(choices=STATES, default=STATE_ACTIVE)
-    username = models.CharField(max_length=32, unique=True,
-                                help_text="Doit contenir uniquement des lettres, chiffres, ou tirets. ")
     comment = models.CharField(help_text="Commentaire, promo", max_length=255,
                                blank=True)
     registered = models.DateTimeField(auto_now_add=True)
-    is_superuser = models.BooleanField(default=False)
 
+    objects = UserManager()
+
+    EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'email']
 
-    objects = UserManager()
+    class Meta:
+        verbose_name = _('user')
+        verbose_name_plural = _('users')
 
     @property
     def is_active(self):
@@ -81,12 +94,6 @@ class User(ExportModelOperationsMixin('user'), AbstractBaseUser):
 
     def get_short_name(self):
         return self.first_name
-
-    def has_perm(self, perm, obj=None):
-        return True
-
-    def has_module_perms(self, app_label):
-        return True
 
     def machines(self):
         return Machine.objects.filter(proprio=self)
