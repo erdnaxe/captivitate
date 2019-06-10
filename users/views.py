@@ -111,11 +111,11 @@ def edit_info(request, userid):
     except User.DoesNotExist:
         messages.error(request, "Utilisateur inexistant")
         return redirect("/")
-    if not request.user.is_admin and user != request.user:
+    if not request.user.is_superuser and user != request.user:
         messages.error(request,
                        "Vous ne pouvez pas modifier un autre user que vous sans droit admin")
         return redirect("/")
-    if not request.user.is_admin:
+    if not request.user.is_superuser:
         user = BaseInfoForm(request.POST or None, instance=user)
     else:
         user = InfoForm(request.POST or None, instance=user)
@@ -140,7 +140,7 @@ def password(request, userid):
     except User.DoesNotExist:
         messages.error(request, "Utilisateur inexistant")
         return redirect("/")
-    if not request.user.is_admin and user != request.user:
+    if not request.user.is_superuser and user != request.user:
         messages.error(request,
                        "Vous ne pouvez pas modifier un autre user que vous sans droit admin")
         return redirect("/" + str(request.user.id))

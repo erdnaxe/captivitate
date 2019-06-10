@@ -4,7 +4,8 @@
 import datetime
 import uuid
 
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.models import UserManager as DjangoUserManager
 from django.db import models
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
@@ -17,41 +18,24 @@ from portail_captif.settings import GENERIC_IPSET_COMMAND, IPSET_NAME, \
 from .tools import apply
 
 
-class UserManager(BaseUserManager):
-    def _create_user(self, username, first_name, last_name, email, password=None,
-                     su=False):
-        if not username:
-            raise ValueError('Users must have an username')
-
-        user = self.model(
-            username=username,
-            first_name=first_name,
-            last_name=last_name,
-            email=self.normalize_email(email),
-        )
-
-        user.set_password(password)
-        user.save(using=self._db)
-        if su:
-            user.make_admin()
-        return user
-
-    def create_user(self, username, first_name, last_name, email, password=None):
+class UserManager(DjangoUserManager):
+    def create_user(self, username, email=None, password=None, **extra_fields):
         """
-        Creates and saves a User with the given username, name, surname, email,
-        and password.
+        Creates and saves an user
         """
-        return self._create_user(username, first_name, last_name, email, password, False)
+        extra_fields.setdefault('is_superuser', False)
+        return self._create_user(username, email, password, **extra_fields)
 
-    def create_superuser(self, username, first_name, last_name, email, password):
+    def create_superuser(self, username, email, password, **extra_fields):
         """
-        Creates and saves a superuser with the given username, name, surname,
-        email, and password.
+        Creates and saves a superuser
         """
-        return self._create_user(username, first_name, last_name, email, password, True)
+        extra_fields.setdefault('is_superuser', True)
+        return self._create_user(username, email, password, **extra_fields)
 
 
 class User(ExportModelOperationsMixin('user'), AbstractBaseUser):
+    # PermissionsMixin TODO
     PRETTY_NAME = "Utilisateurs"
     STATE_ACTIVE = 0
     STATE_DISABLED = 1
@@ -67,11 +51,11 @@ class User(ExportModelOperationsMixin('user'), AbstractBaseUser):
     email = models.EmailField()
     state = models.IntegerField(choices=STATES, default=STATE_ACTIVE)
     username = models.CharField(max_length=32, unique=True,
-                              help_text="Doit contenir uniquement des lettres, chiffres, ou tirets. ")
+                                help_text="Doit contenir uniquement des lettres, chiffres, ou tirets. ")
     comment = models.CharField(help_text="Commentaire, promo", max_length=255,
                                blank=True)
     registered = models.DateTimeField(auto_now_add=True)
-    admin = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'email']
@@ -84,23 +68,12 @@ class User(ExportModelOperationsMixin('user'), AbstractBaseUser):
 
     @property
     def is_staff(self):
-        return self.is_admin
-
-    @property
-    def is_admin(self):
-        return self.admin
-
-    @is_admin.setter
-    def is_admin(self, value):
-        if value and not self.is_admin:
-            self.make_admin()
-        elif not value and self.is_admin:
-            self.un_admin()
+        return self.is_superuser
 
     def has_perms(self, perms, obj=None):
         for perm in perms:
             if perm == "admin":
-                return self.is_admin
+                return self.is_superuser
         return False
 
     def get_full_name(self):
@@ -113,17 +86,7 @@ class User(ExportModelOperationsMixin('user'), AbstractBaseUser):
         return True
 
     def has_module_perms(self, app_label):
-        # Simplest version again
         return True
-
-    def make_admin(self):
-        """ Make User admin """
-        self.admin = True
-        self.save()
-
-    def un_admin(self):
-        self.admin = False
-        self.save()
 
     def machines(self):
         return Machine.objects.filter(proprio=self)

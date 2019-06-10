@@ -37,7 +37,7 @@ class UserCreationForm(forms.ModelForm):
         validators=[MinLengthValidator(8)],
         max_length=255,
     )
-    is_admin = forms.BooleanField(label='is admin')
+    is_superuser = forms.BooleanField(label='is superuser')
 
     class Meta:
         model = User
@@ -56,7 +56,7 @@ class UserCreationForm(forms.ModelForm):
         user = super(UserCreationForm, self).save(commit=False)
         user.set_password(self.cleaned_data["password1"])
         user.save()
-        user.is_admin = self.cleaned_data.get("is_admin")
+        user.is_superuser = self.cleaned_data.get("is_superuser")
         return user
 
 
@@ -66,7 +66,7 @@ class UserChangeForm(forms.ModelForm):
     password hash display field.
     """
     password = ReadOnlyPasswordHashField()
-    is_admin = forms.BooleanField(label='is admin', required=False)
+    is_superuser = forms.BooleanField(label='is superuser', required=False)
 
     class Meta:
         model = User
@@ -74,8 +74,8 @@ class UserChangeForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(UserChangeForm, self).__init__(*args, **kwargs)
-        print("User is admin : %s" % kwargs['instance'].is_admin)
-        self.initial['is_admin'] = kwargs['instance'].is_admin
+        print("User is admin : %s" % kwargs['instance'].is_superuser)
+        self.initial['is_superuser'] = kwargs['instance'].is_superuser
 
     def clean_password(self):
         # Regardless of what the user provides, return the initial value.
@@ -85,8 +85,8 @@ class UserChangeForm(forms.ModelForm):
 
     def save(self, commit=True):
         # Save the provided password in hashed format
-        user = super(UserChangeForm, self).save(commit=False)
-        user.is_admin = self.cleaned_data.get("is_admin")
+        user = super().save(commit=False)
+        user.is_superuser = self.cleaned_data.get("is_superuser")
         if commit:
             user.save()
         return user
@@ -121,5 +121,5 @@ class InfoForm(BaseInfoForm):
             'comment',
             'last_name',
             'email',
-            'admin',
+            'is_superuser',
         ]
