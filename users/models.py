@@ -18,13 +18,13 @@ from .tools import apply
 
 
 class UserManager(BaseUserManager):
-    def _create_user(self, pseudo, name, surname, email, password=None,
+    def _create_user(self, username, name, surname, email, password=None,
                      su=False):
-        if not pseudo:
+        if not username:
             raise ValueError('Users must have an username')
 
         user = self.model(
-            pseudo=pseudo,
+            username=username,
             name=name,
             surname=surname,
             email=self.normalize_email(email),
@@ -36,19 +36,19 @@ class UserManager(BaseUserManager):
             user.make_admin()
         return user
 
-    def create_user(self, pseudo, name, surname, email, password=None):
+    def create_user(self, username, name, surname, email, password=None):
         """
-        Creates and saves a User with the given pseudo, name, surname, email,
+        Creates and saves a User with the given username, name, surname, email,
         and password.
         """
-        return self._create_user(pseudo, name, surname, email, password, False)
+        return self._create_user(username, name, surname, email, password, False)
 
-    def create_superuser(self, pseudo, name, surname, email, password):
+    def create_superuser(self, username, name, surname, email, password):
         """
-        Creates and saves a superuser with the given pseudo, name, surname,
+        Creates and saves a superuser with the given username, name, surname,
         email, and password.
         """
-        return self._create_user(pseudo, name, surname, email, password, True)
+        return self._create_user(username, name, surname, email, password, True)
 
 
 class User(ExportModelOperationsMixin('user'), AbstractBaseUser):
@@ -66,14 +66,14 @@ class User(ExportModelOperationsMixin('user'), AbstractBaseUser):
     surname = models.CharField(max_length=255)
     email = models.EmailField()
     state = models.IntegerField(choices=STATES, default=STATE_ACTIVE)
-    pseudo = models.CharField(max_length=32, unique=True,
+    username = models.CharField(max_length=32, unique=True,
                               help_text="Doit contenir uniquement des lettres, chiffres, ou tirets. ")
     comment = models.CharField(help_text="Commentaire, promo", max_length=255,
                                blank=True)
     registered = models.DateTimeField(auto_now_add=True)
     admin = models.BooleanField(default=False)
 
-    USERNAME_FIELD = 'pseudo'
+    USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['name', 'surname', 'email']
 
     objects = UserManager()

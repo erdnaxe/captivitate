@@ -97,7 +97,7 @@ def new_user(request):
         req.save()
         reset_passwd_mail(req, request)
         messages.success(request,
-                         "L'utilisateur %s a été créé, un mail pour l'initialisation du mot de passe a été envoyé" % user.pseudo)
+                         "L'utilisateur %s a été créé, un mail pour l'initialisation du mot de passe a été envoyé" % user.username)
         capture_mac(request, user)
         return redirect("/")
     return form({'userform': user}, 'users/user.html', request)
@@ -212,7 +212,7 @@ def reset_password(request):
     userform = ResetPasswordForm(request.POST or None)
     if userform.is_valid():
         try:
-            user = User.objects.get(pseudo=userform.cleaned_data['pseudo'],
+            user = User.objects.get(username=userform.cleaned_data['username'],
                                     email=userform.cleaned_data['email'])
         except User.DoesNotExist:
             messages.error(request, "Cet utilisateur n'existe pas")

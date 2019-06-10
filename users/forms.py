@@ -41,7 +41,7 @@ class UserCreationForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('pseudo', 'name', 'surname', 'email')
+        fields = ('username', 'name', 'surname', 'email')
 
     def clean_password2(self):
         # Check that the two password entries match
@@ -70,7 +70,7 @@ class UserChangeForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('pseudo', 'password', 'name', 'surname', 'email')
+        fields = ('username', 'password', 'name', 'surname', 'email')
 
     def __init__(self, *args, **kwargs):
         super(UserChangeForm, self).__init__(*args, **kwargs)
@@ -93,7 +93,7 @@ class UserChangeForm(forms.ModelForm):
 
 
 class ResetPasswordForm(forms.Form):
-    pseudo = forms.CharField(label=u'Pseudo', max_length=255)
+    username = forms.CharField(label='username', max_length=255)
     email = forms.EmailField(max_length=255)
 
 
@@ -107,7 +107,7 @@ class BaseInfoForm(ModelForm):
         model = User
         fields = [
             'name',
-            'pseudo',
+            'username',
             'surname',
             'email',
         ]
@@ -117,7 +117,7 @@ class InfoForm(BaseInfoForm):
     class Meta(BaseInfoForm.Meta):
         fields = [
             'name',
-            'pseudo',
+            'username',
             'comment',
             'surname',
             'email',

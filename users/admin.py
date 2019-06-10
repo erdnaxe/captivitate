@@ -23,15 +23,15 @@ class UserAdmin(VersionAdmin, BaseUserAdmin):
     # The forms to add and change user instances
     form = UserChangeForm
     add_form = UserCreationForm
-    search_fields = ('name', 'surname', 'pseudo')
+    search_fields = ('name', 'surname', 'username')
 
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ('pseudo', 'name', 'surname', 'email', 'is_admin')
+    list_display = ('username', 'name', 'surname', 'email', 'is_admin')
     list_filter = ()
     fieldsets = (
-        (None, {'fields': ('pseudo', 'password')}),
+        (None, {'fields': ('username', 'password')}),
         ('Personal info', {'fields': ('name', 'surname', 'email')}),
         ('Permissions', {'fields': ('is_admin',)}),
     )
@@ -41,11 +41,11 @@ class UserAdmin(VersionAdmin, BaseUserAdmin):
         (None, {
             'classes': ('wide',),
             'fields': (
-                'pseudo', 'name', 'surname', 'email', 'is_admin', 'password1',
+                'username', 'name', 'surname', 'email', 'is_admin', 'password1',
                 'password2')}
          ),
     )
-    ordering = ('pseudo',)
+    ordering = ('username',)
     filter_horizontal = ()
 
     # TODO(erdnaxe): édition date inscription, dernière co, commentaire, statut
