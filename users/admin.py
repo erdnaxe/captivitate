@@ -16,23 +16,23 @@ class RequestAdmin(admin.ModelAdmin):
 
 class MachineAdmin(VersionAdmin):
     list_display = ('mac_address', 'proprio')
-    search_fields = ('mac_address', 'proprio__name')
+    search_fields = ('mac_address', 'proprio__username')
 
 
 class UserAdmin(VersionAdmin, BaseUserAdmin):
     # The forms to add and change user instances
     form = UserChangeForm
     add_form = UserCreationForm
-    search_fields = ('name', 'last_name', 'username')
+    search_fields = ('first_name', 'last_name', 'username')
 
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ('username', 'name', 'last_name', 'email', 'is_admin')
+    list_display = ('username', 'first_name', 'last_name', 'email', 'is_admin')
     list_filter = ()
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        ('Personal info', {'fields': ('name', 'last_name', 'email')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'email')}),
         ('Permissions', {'fields': ('is_admin',)}),
     )
     # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
@@ -41,7 +41,7 @@ class UserAdmin(VersionAdmin, BaseUserAdmin):
         (None, {
             'classes': ('wide',),
             'fields': (
-                'username', 'name', 'last_name', 'email', 'is_admin', 'password1',
+                'username', 'first_name', 'last_name', 'email', 'is_admin', 'password1',
                 'password2')}
          ),
     )
