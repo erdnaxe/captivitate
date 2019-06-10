@@ -18,7 +18,7 @@ from .tools import apply
 
 
 class UserManager(BaseUserManager):
-    def _create_user(self, username, name, surname, email, password=None,
+    def _create_user(self, username, name, last_name, email, password=None,
                      su=False):
         if not username:
             raise ValueError('Users must have an username')
@@ -26,7 +26,7 @@ class UserManager(BaseUserManager):
         user = self.model(
             username=username,
             name=name,
-            surname=surname,
+            last_name=last_name,
             email=self.normalize_email(email),
         )
 
@@ -36,19 +36,19 @@ class UserManager(BaseUserManager):
             user.make_admin()
         return user
 
-    def create_user(self, username, name, surname, email, password=None):
+    def create_user(self, username, name, last_name, email, password=None):
         """
         Creates and saves a User with the given username, name, surname, email,
         and password.
         """
-        return self._create_user(username, name, surname, email, password, False)
+        return self._create_user(username, name, last_name, email, password, False)
 
-    def create_superuser(self, username, name, surname, email, password):
+    def create_superuser(self, username, name, last_name, email, password):
         """
         Creates and saves a superuser with the given username, name, surname,
         email, and password.
         """
-        return self._create_user(username, name, surname, email, password, True)
+        return self._create_user(username, name, last_name, email, password, True)
 
 
 class User(ExportModelOperationsMixin('user'), AbstractBaseUser):
@@ -63,7 +63,7 @@ class User(ExportModelOperationsMixin('user'), AbstractBaseUser):
     )
 
     name = models.CharField(max_length=255)
-    surname = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
     email = models.EmailField()
     state = models.IntegerField(choices=STATES, default=STATE_ACTIVE)
     username = models.CharField(max_length=32, unique=True,
@@ -74,7 +74,7 @@ class User(ExportModelOperationsMixin('user'), AbstractBaseUser):
     admin = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['name', 'surname', 'email']
+    REQUIRED_FIELDS = ['name', 'last_name', 'email']
 
     objects = UserManager()
 
@@ -104,7 +104,7 @@ class User(ExportModelOperationsMixin('user'), AbstractBaseUser):
         return False
 
     def get_full_name(self):
-        return '%s %s' % (self.name, self.surname)
+        return '%s %s' % (self.name, self.last_name)
 
     def get_short_name(self):
         return self.name
@@ -129,7 +129,7 @@ class User(ExportModelOperationsMixin('user'), AbstractBaseUser):
         return Machine.objects.filter(proprio=self)
 
     def __str__(self):
-        return self.name + " " + self.surname
+        return self.name + " " + self.last_name
 
 
 class Machine(ExportModelOperationsMixin('machine'), models.Model):
