@@ -35,8 +35,8 @@ class UserManager(DjangoUserManager):
         return self._create_user(username, email, password, **extra_fields)
 
 
-class User(ExportModelOperationsMixin('user'), AbstractBaseUser,
-           PermissionsMixin):
+class User(ExportModelOperationsMixin('user'), PermissionsMixin,
+           AbstractBaseUser):
     STATE_ACTIVE = 0
     STATE_DISABLED = 1
     STATE_ARCHIVE = 2
@@ -83,23 +83,11 @@ class User(ExportModelOperationsMixin('user'), AbstractBaseUser,
     def is_staff(self):
         return self.is_superuser
 
-    def has_perms(self, perms, obj=None):
-        for perm in perms:
-            if perm == "admin":
-                return self.is_superuser
-        return False
-
     def get_full_name(self):
         return '%s %s' % (self.first_name, self.last_name)
 
     def get_short_name(self):
         return self.first_name
-
-    def machines(self):
-        return Machine.objects.filter(proprio=self)
-
-    def __str__(self):
-        return self.first_name + " " + self.last_name
 
 
 class Machine(ExportModelOperationsMixin('machine'), models.Model):
@@ -149,15 +137,3 @@ class Request(models.Model):
         if not self.token:
             self.token = str(uuid.uuid4()).replace('-', '')  # remove hyphens
         super().save(**kwargs)
-
-
-def fill_ipset():
-    all_machines = Machine.objects.filter(
-        proprio__in=User.objects.filter(state=User.STATE_ACTIVE))
-    ipset = "%s\nCOMMIT\n" % '\n'.join(
-        ["add %s %s" % (IPSET_NAME, str(machine.mac_address)) for machine in
-         all_machines])
-    command_to_execute = ["sudo", "-n"] + GENERIC_IPSET_COMMAND.split() + [
-        "restore"]
-    process = apply(command_to_execute)
-    process.communicate(input=ipset.encode('utf-8'))

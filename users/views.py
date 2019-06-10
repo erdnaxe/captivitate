@@ -18,7 +18,7 @@ from reversion import revisions as reversion
 
 from portail_captif.settings import REQ_EXPIRE_STR, DEFAULT_FROM_EMAIL, \
     ASSO_NAME, ASSO_EMAIL, SITE_NAME, CAPTIVE_IP_RANGE, CAPTIVE_WIFI
-from users.forms import PassForm, ResetPasswordForm, InfoForm, BaseInfoForm
+from users.forms import PassForm, ResetPasswordForm, BaseInfoForm
 from users.models import User, Request, Machine
 from users.tools import mac_from_ip
 
@@ -115,10 +115,7 @@ def edit_info(request, userid):
         messages.error(request,
                        "Vous ne pouvez pas modifier un autre user que vous sans droit admin")
         return redirect("/")
-    if not request.user.is_superuser:
-        user = BaseInfoForm(request.POST or None, instance=user)
-    else:
-        user = InfoForm(request.POST or None, instance=user)
+    user = BaseInfoForm(request.POST or None, instance=user)
     if user.is_valid():
         with transaction.atomic(), reversion.create_revision():
             user.save()

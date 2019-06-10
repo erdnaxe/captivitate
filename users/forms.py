@@ -23,7 +23,7 @@ class PassForm(forms.Form):
     )
 
 
-class UserCreationForm(forms.ModelForm):
+class UserCreationAdminForm(forms.ModelForm):
     """A form for creating new users. Includes all the required
     fields, plus a repeated password."""
     password1 = forms.CharField(
@@ -53,14 +53,14 @@ class UserCreationForm(forms.ModelForm):
 
     def save(self, commit=True):
         # Save the provided password in hashed format
-        user = super(UserCreationForm, self).save(commit=False)
+        user = super().save(commit=False)
         user.set_password(self.cleaned_data["password1"])
         user.save()
         user.is_superuser = self.cleaned_data.get("is_superuser")
         return user
 
 
-class UserChangeForm(forms.ModelForm):
+class UserAdminForm(forms.ModelForm):
     """A form for updating users. Includes all the fields on
     the user, but replaces the password field with admin's
     password hash display field.
@@ -73,7 +73,7 @@ class UserChangeForm(forms.ModelForm):
         fields = ('username', 'password', 'first_name', 'last_name', 'email')
 
     def __init__(self, *args, **kwargs):
-        super(UserChangeForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         print("User is admin : %s" % kwargs['instance'].is_superuser)
         self.initial['is_superuser'] = kwargs['instance'].is_superuser
 
@@ -98,11 +98,6 @@ class ResetPasswordForm(forms.Form):
 
 
 class BaseInfoForm(ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['first_name'].label = 'Prénom'
-        self.fields['last_name'].label = 'Nom'
-
     class Meta:
         model = User
         fields = [
@@ -111,15 +106,6 @@ class BaseInfoForm(ModelForm):
             'last_name',
             'email',
         ]
-
-
-class InfoForm(BaseInfoForm):
-    class Meta(BaseInfoForm.Meta):
-        fields = [
-            'first_name',
-            'username',
-            'comment',
-            'last_name',
-            'email',
-            'is_superuser',
-        ]
+        help_texts = {
+            'email': 'Le mail est utilisé pour initialiser le compte.',
+        }

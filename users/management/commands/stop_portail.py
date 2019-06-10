@@ -1,8 +1,10 @@
 # -*- mode: python; coding: utf-8 -*-
 # SPDX-License-Identifier: GPL-2.0-or-later
-#
-# Ce script est appellé avant le démarage du portail,
-# il insère les bonnes règles dans l'iptables et active le routage
+
+"""
+This script should run after the captive portal stops.
+It empties iptables and deactivates routing.
+"""
 
 from django.core.management.base import BaseCommand
 
@@ -16,6 +18,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # Destruction de l'iptables
         disable_iptables()
+
         # Desactivation du routage sur les bonnes if
         for interface in AUTORIZED_INTERFACES:
             apply(["sudo", "-n", "sysctl",

@@ -3,7 +3,7 @@
 
 import subprocess
 
-from portail_captif.settings import GENERIC_IPSET_COMMAND, IPSET_NAME, \
+from portail_captif.settings import IPSET_NAME, \
     FORBIDEN_INTERFACES, SERVER_SELF_IP, AUTORIZED_INTERFACES, \
     PORTAIL_ACTIVE, INTERNAL_INTERFACE
 
@@ -21,17 +21,6 @@ def mac_from_ip(ip):
         return str(mac_addr)
     else:
         return None
-
-
-def create_ip_set():
-    command_to_execute = ["sudo", "-n"] + GENERIC_IPSET_COMMAND.split() + [
-        "create", IPSET_NAME, "hash:mac", "hashsize", "1024", "maxelem",
-        "65536"]
-    apply(command_to_execute)
-    command_to_execute = ["sudo", "-n"] + GENERIC_IPSET_COMMAND.split() + [
-        "flush", IPSET_NAME]
-    apply(command_to_execute)
-    return
 
 
 class iptables:

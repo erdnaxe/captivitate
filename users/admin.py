@@ -5,8 +5,9 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import Group
 from reversion.admin import VersionAdmin
+from django.utils.translation import ugettext_lazy as _
 
-from .forms import UserChangeForm, UserCreationForm
+from .forms import UserAdminForm, UserCreationAdminForm
 from .models import User, Machine, Request
 
 
@@ -21,19 +22,17 @@ class MachineAdmin(VersionAdmin):
 
 class UserAdmin(VersionAdmin, BaseUserAdmin):
     # The forms to add and change user instances
-    form = UserChangeForm
-    add_form = UserCreationForm
-    search_fields = ('first_name', 'last_name', 'username')
+    form = UserAdminForm
+    add_form = UserCreationAdminForm
 
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ('username', 'first_name', 'last_name', 'email', 'is_superuser')
-    list_filter = ()
+    list_filter = ('is_superuser',)
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name', 'email')}),
-        ('Permissions', {'fields': ('is_superuser',)}),
+        (_('Personal info'), {'fields': ('first_name', 'last_name', 'email', 'comment')}),
+        (_('Permissions'), {'fields': ('is_superuser', 'state')}),
     )
     # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
     # overrides get_fieldsets to use this attribute when creating a user.
@@ -45,11 +44,9 @@ class UserAdmin(VersionAdmin, BaseUserAdmin):
                 'password2')}
          ),
     )
-    ordering = ('username',)
     filter_horizontal = ()
 
-    # TODO(erdnaxe): édition date inscription, dernière co, commentaire, statut
-    # changement mdp
+    # TODO(erdnaxe): édition date inscription, changement mdp
 
 
 admin.site.register(Machine, MachineAdmin)
