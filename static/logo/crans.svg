@@ -9,7 +9,7 @@
         img.style.transform = "rotate(" + deg + "deg)";
         img.style.transformOrigin = "968.7505px 1000px";
         setTimeout("myFunction()", 10);
-        deg = deg - 1;
+        deg = deg + 1;
     }
     myFunction();
     ]]>
