@@ -7,8 +7,6 @@ from django.views.generic.base import RedirectView
 from django_prometheus import exports
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^', include('django.contrib.auth.urls')),
     url(r'^', include('users.urls')),
 
     # Prometheus metrics
@@ -17,4 +15,14 @@ urlpatterns = [
 
     # Make Android detects that is it a captive portal
     url(r'^generate_204$', RedirectView.as_view(url='/')),
+
+    # Include Django Contrib and Core routers
+    # admin/login/ is redirected to the non-admin login page
+    url(r'^i18n/', include('django.conf.urls.i18n')),
+    url(r'^accounts/', include('django.contrib.auth.urls')),
+    url(r'^accounts/profile/',
+        RedirectView.as_view(pattern_name='users:index')),
+    url(r'^admin/login/', RedirectView.as_view(pattern_name='login')),
+    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+    url(r'^admin/', admin.site.urls),
 ]

@@ -74,7 +74,23 @@ SPDX-License-Identifier: GPL-2.0-or-later
 {% block footer %}
     {% if not is_popup %}
         <div id="footer">
-            <p>Portail captif 2016-2019 &mdash; <a href="mailto:cableurs@crans.org">Nous contactez</a></p>
+            <form action="{% url 'set_language' %}" method="post">
+                {% csrf_token %}
+                <select title="language" name="language" onchange="this.form.submit()">
+                    {% get_current_language as LANGUAGE_CODE %}
+                    {% get_available_languages as LANGUAGES %}
+                    {% get_language_info_list for LANGUAGES as languages %}
+                    {% for language in languages %}
+                        <option value="{{ language.code }}"{% if language.code == LANGUAGE_CODE %} selected{% endif %}>
+                            {{ language.name_local }} ({{ language.code }})
+                        </option>
+                    {% endfor %}
+                </select>
+                <noscript>
+                    <input type="submit">
+                </noscript>
+                Portail captif 2016-2019 &mdash; <a href="mailto:cableurs@crans.org">Nous contactez</a>
+            </form>
         </div>
     {% endif %}
 {% endblock %}
