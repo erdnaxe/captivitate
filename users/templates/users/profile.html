@@ -4,6 +4,7 @@ SPDX-License-Identifier: GPL-2.0-or-later
 {% endcomment %}
 
 {% load bootstrap3 %}
+{% load i18n %}
 
 {% block title %}Profil{% endblock %}
 
@@ -14,26 +15,26 @@ SPDX-License-Identifier: GPL-2.0-or-later
             <i class="glyphicon glyphicon-edit"></i>
             Editer
         </a>
-        <a class="btn btn-primary btn-sm" role="button" href="{% url 'users:password' user.id %}">
+        <a class="btn btn-primary btn-sm" role="button" href="{% url 'password_change' %}">
             <i class="glyphicon glyphicon-lock"></i>
             Changer le mot de passe
         </a>
     </div>
     <dl class="dl-horizontal row profile-info pt4">
         <div class="col-md-6">
-            <dt>Prénom</dt>
+            <dt>{% trans "first name" as rel %}{{ rel|capfirst }}</dt>
             <dd>{{ user.first_name }}</dd>
         </div>
         <div class="col-md-6">
-            <dt>Nom</dt>
+            <dt>{% trans "last name" as rel %}{{ rel|capfirst }}</dt>
             <dd>{{ user.last_name }}</dd>
         </div>
         <div class="col-md-6">
-            <dt>Nom d'utilisateur</dt>
+            <dt>{% trans "username" as rel %}{{ rel|capfirst }}</dt>
             <dd>{{ user.username }}</dd>
         </div>
         <div class="col-md-6">
-            <dt>E-mail</dt>
+            <dt>{% trans "email address" as rel %}{{ rel|capfirst }}</dt>
             <dd>{{ user.email }}</dd>
         </div>
         <div class="col-md-6">
@@ -41,11 +42,11 @@ SPDX-License-Identifier: GPL-2.0-or-later
             <dd>{{ user.comment }}</dd>
         </div>
         <div class="col-md-6">
-            <dt>Date d'inscription</dt>
+            <dt>{% trans "date joined" as rel %}{{ rel|capfirst }}</dt>
             <dd>{{ user.registered }}</dd>
         </div>
         <div class="col-md-6">
-            <dt>Dernière connexion</dt>
+            <dt>{% trans "last login" as rel %}{{ rel|capfirst }}</dt>
             <dd>{{ user.last_login }}</dd>
         </div>
         <div class="col-md-6">

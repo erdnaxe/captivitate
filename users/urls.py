@@ -11,7 +11,6 @@ urlpatterns = [
     url(r'^new_user/$', views.new_user, name='new-user'),
     url(r'^capture/$', views.capture, name='capture'),
     url(r'^edit_info/(?P<userid>[0-9]+)$', views.edit_info, name='edit-info'),
-    url(r'^password/(?P<userid>[0-9]+)$', views.password, name='password'),
     url(r'^process/(?P<token>[a-z0-9]{32})/$', views.process, name='process'),
     url(r'^reset_password/$', views.reset_password, name='reset-password'),
 ]

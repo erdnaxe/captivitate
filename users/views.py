@@ -127,26 +127,6 @@ def edit_info(request, userid):
     return form({'userform': user}, 'users/user.html', request)
 
 
-@login_required
-def password(request, userid):
-    """ Reinitialisation d'un mot de passe à partir de l'userid,
-    pour self par défaut, pour tous sans droit si droit admin,
-    pour tous si droit bureau """
-    try:
-        user = User.objects.get(pk=userid)
-    except User.DoesNotExist:
-        messages.error(request, "Utilisateur inexistant")
-        return redirect("/")
-    if not request.user.is_superuser and user != request.user:
-        messages.error(request,
-                       "Vous ne pouvez pas modifier un autre user que vous sans droit admin")
-        return redirect("/" + str(request.user.id))
-    u_form = PassForm(request.POST or None)
-    if u_form.is_valid():
-        return password_change_action(u_form, user, request)
-    return form({'userform': u_form}, 'users/user.html', request)
-
-
 def get_ip(request):
     """Returns the IP of the request, accounting for the possibility of being
     behind a proxy.

@@ -4,6 +4,7 @@ SPDX-License-Identifier: GPL-2.0-or-later
 
 {% load staticfiles %}
 {% load bootstrap3 %}
+{% load i18n %}
 
 <!DOCTYPE html>
 <html lang="fr">
@@ -41,20 +42,26 @@ SPDX-License-Identifier: GPL-2.0-or-later
             </div>
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav navbar-right">
-                    {% if user.is_staff %}
-                        <li><a href="{% url "admin:index" %}">Administration</a></li>
-                    {% endif %}
-                    <li>
-                        {% if request.user.is_authenticated %}
-                            <a href="{% url 'logout' %}?next=/">
-                                <span class="glyphicon glyphicon-log-out"></span> Se déconnecter
-                            </a>
-                        {% else %}
-                            <a href="{% url 'login' %}">
-                                <span class="glyphicon glyphicon-log-in"></span> Se connecter
-                            </a>
+                    {% if request.user.is_authenticated %}
+                        <li class="navbar-text">
+                            {% trans 'Welcome,' %}
+                            <strong>{% firstof user.get_short_name user.get_username %}</strong>
+                        </li>
+                        {% if user.is_staff %}
+                            <li><a href="{% url 'admin:index' %}">{% trans 'View admin' %}</a></li>
                         {% endif %}
-                    </li>
+                        <li>
+                            <a href="{% url 'logout' %}?next=/">
+                                <span class="glyphicon glyphicon-log-out"></span> {% trans 'Log out' %}
+                            </a>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href="{% url 'login' %}">
+                                <span class="glyphicon glyphicon-log-in"></span> {% trans 'Log in' %}
+                            </a>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
@@ -70,7 +77,23 @@ SPDX-License-Identifier: GPL-2.0-or-later
 
 <footer class="navbar navbar-default">
     <div class="container">
-        <p>Portail captif 2016-2019 &mdash; <a href="mailto:cableurs@crans.org">Nous contactez</a></p>
+        <form action="{% url 'set_language' %}" method="post">
+            {% csrf_token %}
+            <select title="language" name="language" onchange="this.form.submit()">
+                {% get_current_language as LANGUAGE_CODE %}
+                {% get_available_languages as LANGUAGES %}
+                {% get_language_info_list for LANGUAGES as languages %}
+                {% for language in languages %}
+                    <option value="{{ language.code }}"{% if language.code == LANGUAGE_CODE %} selected{% endif %}>
+                        {{ language.name_local }} ({{ language.code }})
+                    </option>
+                {% endfor %}
+            </select>
+            <noscript>
+                <input type="submit">
+            </noscript>
+            Portail captif 2016-2019 &mdash; <a href="mailto:cableurs@crans.org">Nous contactez</a>
+        </form>
     </div>
 </footer>
 </body>
