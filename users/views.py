@@ -70,7 +70,7 @@ def reset_passwd_mail(req, request):
     """ Prend en argument un request, envoie un mail de réinitialisation de mot de pass """
     t = loader.get_template('users/email_passwd_request')
     c = {
-        'name': str(req.user.name) + ' ' + str(req.user.last_name),
+        'name': str(req.user.first_name) + ' ' + str(req.user.last_name),
         'asso': ASSO_NAME,
         'asso_mail': ASSO_EMAIL,
         'site_name': SITE_NAME,
