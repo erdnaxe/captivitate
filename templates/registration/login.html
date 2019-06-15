@@ -1,35 +1,61 @@
-{% extends "base.html" %}
+{% extends "admin/login.html" %}
 {% comment %}
 SPDX-License-Identifier: GPL-2.0-or-later
+
+This templates takes admin/login.html and patch the password reset link.
 {% endcomment %}
+{% load i18n static %}
 
-{% load bootstrap3 %}
-
-{% block title %}Login{% endblock %}
+{% block title %}{% trans "Log in" %}{% endblock %}
 
 {% block content %}
-    {% if form.errors %}
-        <p>Your username and password didn't match. Please try again.</p>
+    {% if form.errors and not form.non_field_errors %}
+        <p class="errornote">
+            {% if form.errors.items|length == 1 %}{% trans "Please correct the error below." %}{% else %}
+                {% trans "Please correct the errors below." %}{% endif %}
+        </p>
     {% endif %}
 
-    {% if next %}
+    {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+            <p class="errornote">
+                {{ error }}
+            </p>
+        {% endfor %}
+    {% endif %}
+
+    <div id="content-main">
+
         {% if user.is_authenticated %}
-            <p>Your account doesn't have access to this page. To proceed,
-                please login with an account that has access.</p>
-        {% else %}
-            <p>Please login to see this page.</p>
+            <p class="errornote">
+                {% blocktrans trimmed %}
+                    You are authenticated as {{ username }}, but are not authorized to
+                    access this page. Would you like to login to a different account?
+                {% endblocktrans %}
+            </p>
         {% endif %}
-    {% endif %}
 
-    <form method="post" action="{% url 'login' %}">
-        {% csrf_token %}
-        {% bootstrap_form form %}
-        {% bootstrap_button "Login" button_type="submit" icon="log-in" %}
-    </form>
+        <form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
+            <div class="form-row">
+                {{ form.username.errors }}
+                {{ form.username.label_tag }} {{ form.username }}
+            </div>
+            <div class="form-row">
+                {{ form.password.errors }}
+                {{ form.password.label_tag }} {{ form.password }}
+                <input type="hidden" name="next" value="{{ next }}"/>
+            </div>
+            {% url 'password_reset' as password_reset_url %}
+            {% if password_reset_url %}
+                <div class="password-reset-link">
+                    {# TODO {{ password_reset_url }} #}
+                    <a href="{% url "users:reset-password" %}">{% trans 'Forgotten your password?' %}</a>
+                </div>
+            {% endif %}
+            <div class="submit-row">
+                <label>&nbsp;</label><input type="submit" value="{% trans 'Log in' %}"/>
+            </div>
+        </form>
 
-    <p>
-        <a class="btn btn-warning btn-sm" role="button" href="{% url 'users:reset-password' %}">
-            Mot de passe oublié ?
-        </a>
-    </p>
+    </div>
 {% endblock %}
