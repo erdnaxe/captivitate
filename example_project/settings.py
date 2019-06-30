@@ -1,26 +1,40 @@
 # -*- mode: python; coding: utf-8 -*-
+# Copyright (C) 2016-2019 by Cr@ns
 # SPDX-License-Identifier: GPL-2.0-or-later
+# This file is part of captivitate.
 
+"""
+Django settings for captivitate project.
+"""
+
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 
 from django.utils.translation import gettext_lazy as _
 
 from .settings_local import *
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Compatibility with Bootstrap 3
+from django.contrib.messages import constants as messages
 
-# Auth definition
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-PASSWORD_HASHERS = (
-    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
-    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
-    'django.contrib.auth.hashers.Argon2PasswordHasher',
-    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
-    'portail_captif.login.SSHAPasswordHasher',
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = '$!-7^wl#wjifjbh)5@f7ji%x!vp7s1vzbvwt27hxv$idixq0u0'
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
+ADMINS = (
+    #('Admin', 'webmaster@example.com'),
 )
 
-AUTH_USER_MODEL = 'users.User'
+SITE_ID = 1
+
+ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -30,16 +44,16 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites',
     'bootstrap3',
     'users',
     'reversion',
     'django_prometheus'
 ]
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django_prometheus.middleware.PrometheusBeforeMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -54,15 +68,13 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sites.middleware.CurrentSiteMiddleware',
     'django_prometheus.middleware.PrometheusAfterMiddleware',
 )
-# 'django.contrib.admindocs.middleware.XViewMiddleware',
-# 'django.middleware.locale.LocaleMiddleware',
 
-ROOT_URLCONF = 'portail_captif.urls'
+ROOT_URLCONF = 'urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, "templates")],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -75,10 +87,41 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'portail_captif.wsgi.application'
+WSGI_APPLICATION = 'wsgi.application'
+
+
+# Database
+# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'captivitate.db'),
+    }
+}
+
+
+# Password validation
+# https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
+
 
 # Internationalization
-# https://docs.djangoproject.com/en/1.8/topics/i18n/
+# https://docs.djangoproject.com/en/2.2/topics/i18n/
 
 LANGUAGE_CODE = 'en'
 
@@ -106,18 +149,33 @@ BOOTSTRAP3 = {
 
 BOOTSTRAP_BASE_URL = '/static/bootstrap/'
 
+
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.11/howto/static-files/
+# https://docs.djangoproject.com/en/2.2/howto/static-files/
 
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-STATIC_ROOT = os.path.join(BASE_DIR, 'static_files')
+# Absolute path to the directory static files should be collected to.
+# Don't put anything in this directory yourself; store your static files
+# in apps' "static/" subdirectories and in STATICFILES_DIRS.
+# Example: "/var/www/example.com/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# URL prefix for static files.
+# Example: "http://example.com/static/", "http://static.example.com/"
 STATIC_URL = '/static/'
-
-# Django sites
-SITE_ID = 1
 
 PAGINATION_NUMBER = 25
 
 PAGINATION_LARGE_NUMBER = 8
 
 GENERIC_IPSET_COMMAND = "/sbin/ipset -q "
+
+
+# Auth definition
+
+AUTH_USER_MODEL = 'users.User'
+
+
+try:
+    from settings_local import *
+except ImportError:
+    pass

@@ -1,24 +1,23 @@
 # -*- mode: python; coding: utf-8 -*-
+# Copyright (C) 2016-2019 by Cr@ns
 # SPDX-License-Identifier: GPL-2.0-or-later
+# This file is part of captivitate.
 
 """
-WSGI config for portail_captif project.
+WSGI config for captivitate example project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
 For more information on this file, see
-https://docs.djangoproject.com/en/1.8/howto/deployment/wsgi/
+https://docs.djangoproject.com/en/2.2/howto/deployment/wsgi/
 """
 
 import os
-import sys
-from os.path import dirname
 
 from django.core.wsgi import get_wsgi_application
 
-# On démarre le système du portail
 
-sys.path.append(dirname(dirname(__file__)))
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "portail_captif.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 
 application = get_wsgi_application()
+

@@ -1,35 +1,5 @@
-# -*- mode: python; coding: utf-8 -*-
-# SPDX-License-Identifier: GPL-2.0-or-later
-
-import os
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-SECRET_KEY = 'SUPER_SECRET'
-
-DB_PASSWORD = 'SUPER_SECRET'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ADMINS = [('Example', 'rezo-admin@example.org')]
-
 # Obligatoire, liste des host autorisés
 ALLOWED_HOSTS = ['127.0.0.1']
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    },
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'NAME': 'portail_captif',
-    #     'USER': 'portail_captif',
-    #     'PASSWORD': DB_PASSWORD,
-    #     'HOST': 'localhost',
-    # },
-}
 
 # Emails
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -52,9 +22,7 @@ X_FRAME_OPTIONS = 'DENY'
 SESSION_COOKIE_AGE = 60 * 60 * 3
 
 # Association information
-
 SITE_NAME = "Portail captif"
-
 ASSO_NAME = "Asso reseau"
 ASSO_EMAIL = "tresorier@ecole.fr"
 

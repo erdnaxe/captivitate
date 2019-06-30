@@ -1,9 +1,11 @@
 # -*- mode: python; coding: utf-8 -*-
+# Copyright (C) 2016-2019 by Cr@ns
 # SPDX-License-Identifier: GPL-2.0-or-later
+# This file is part of captivitate.
 
 from django.conf.urls import include, url
 from django.contrib import admin
-from django.views.generic.base import RedirectView
+from django.views.generic import RedirectView
 from django_prometheus import exports
 
 urlpatterns = [
