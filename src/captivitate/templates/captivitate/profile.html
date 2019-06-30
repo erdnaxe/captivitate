@@ -42,7 +42,7 @@ SPDX-License-Identifier: GPL-2.0-or-later
         </div>
         <div class="col-md-6">
             <dt>{% trans "date joined" as rel %}{{ rel|capfirst }}</dt>
-            <dd>{{ user.registered }}</dd>
+            <dd>{{ user.date_joined }}</dd>
         </div>
         <div class="col-md-6">
             <dt>{% trans "last login" as rel %}{{ rel|capfirst }}</dt>
@@ -50,12 +50,10 @@ SPDX-License-Identifier: GPL-2.0-or-later
         </div>
         <div class="col-md-6">
             <dt>Statut</dt>
-            <dd>{% if user.state == 0 %}
+            <dd>{% if user.is_active %}
                 <i class="text-success">Actif</i>
-            {% elif user.state == 1 %}
+            {% else %}
                 <i class="text-danger">Désactivé</i>
-            {% elif user.state == 2 %}
-                <i class="text-warning">Archivé</i>
             {% endif %}
             </dd>
         </div>

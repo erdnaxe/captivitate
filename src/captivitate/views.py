@@ -5,21 +5,20 @@ import ipaddress
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.signals import user_logged_in
-from django.core.mail import send_mail
-from django.urls import reverse
 from django.db import transaction
 from django.http import Http404
-from django.shortcuts import get_object_or_404, render, redirect
-from django.template import loader
+from django.shortcuts import render, redirect
 from django.template.context_processors import csrf
-from django.utils import timezone
+from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 from reversion import revisions as reversion
 
-from .forms import PassForm, ResetPasswordForm, BaseInfoForm
-from .models import User, Request, Machine
-from .tools import mac_from_ip
 from .apps import CaptivitateConfig
+from .forms import ResetPasswordForm, BaseInfoForm
+from .models import User, Machine
+from .tools import mac_from_ip
 
 
 def form(ctx, template, request):
@@ -46,65 +45,47 @@ def index(request):
             }
         )
     else:
-        return form({}, 'captivitate/index.html', request)
-
-
-def password_change_action(u_form, user, request, req=False):
-    """ Fonction qui effectue le changeemnt de mdp bdd"""
-    if u_form.cleaned_data['passwd1'] != u_form.cleaned_data['passwd2']:
-        messages.error(request, "Les 2 mots de passe différent")
-        return form({'userform': u_form}, 'captivitate/user.html', request)
-    user.set_password(u_form.cleaned_data['passwd1'])
-    with transaction.atomic(), reversion.create_revision():
-        user.save()
-        reversion.set_comment("Réinitialisation du mot de passe")
-    messages.success(request, "Le mot de passe a changé")
-    if req:
-        req.delete()
-        return redirect("/")
-    return redirect("/")
-
-
-def reset_passwd_mail(req, request):
-    """ Prend en argument un request, envoie un mail de réinitialisation de mot de pass """
-    t = loader.get_template('captivitate/email_passwd_request')
-    c = {
-        'name': str(req.user.first_name) + ' ' + str(req.user.last_name),
-        'asso': CaptivitateConfig.ASSO_NAME,
-        'asso_mail': CaptivitateConfig.ASSO_EMAIL,
-        'site_name': CaptivitateConfig.SITE_NAME,
-        'url': request.build_absolute_uri(
-            reverse('captivitate:process', kwargs={'token': req.token})),
-        'expire_in': CaptivitateConfig.request_expiry_string,
-    }
-    send_mail('Votre compte %s' % CaptivitateConfig.SITE_NAME, t.render(c),
-              CaptivitateConfig.default_from_email, [req.user.email], fail_silently=False)
-    return
+        return render(request, 'captivitate/index.html', {})
 
 
 def new_user(request):
-    """ Vue de création d'un nouvel utilisateur, envoie un mail pour le mot de passe"""
+    """
+    View to create a new user
+    """
     user = BaseInfoForm(request.POST or None)
     if user.is_valid():
         user = user.save(commit=False)
         with transaction.atomic(), reversion.create_revision():
             user.save()
             reversion.set_comment("Création")
-        req = Request()
-        req.type = Request.PASSWD
-        req.user = user
-        req.save()
-        reset_passwd_mail(req, request)
-        messages.success(request,
-                         "L'utilisateur %s a été créé, un mail pour l'initialisation du mot de passe a été envoyé" % user.username)
+
+        # Virtually fill the password reset form from Django Contrib Auth
+        # TODO doesn't work
+        password_reset = PasswordResetForm(data={'email': user.email})
+        if password_reset.is_valid():
+            password_reset.save(
+                request=request,
+                use_https=request.is_secure(),
+            )
+            messages.success(request, _("User successfully created! "
+                                        "A password initialisation email "
+                                        "was sent."))
+            return redirect(reverse('index'))
+        else:
+            messages.error(request, _("The email is invalid."))
+
+        # Try to register the current MAC address
         capture_mac(request, user)
+
         return redirect("/")
     return form({'userform': user}, 'captivitate/user.html', request)
 
 
 @login_required
 def edit_info(request, userid):
-    """ Edite un utilisateur à partir de son id, si l'id est différent de request.user, vérifie la possession du droit admin """
+    """
+    View to edit an user
+    """
     try:
         user = User.objects.get(pk=userid)
     except User.DoesNotExist:
@@ -127,7 +108,8 @@ def edit_info(request, userid):
 
 
 def get_ip(request):
-    """Returns the IP of the request, accounting for the possibility of being
+    """
+    Returns the IP of the request, accounting for the possibility of being
     behind a proxy.
     """
     ip = request.META.get("HTTP_X_FORWARDED_FOR", None)
@@ -185,39 +167,30 @@ def capture(request):
 
 
 def reset_password(request):
+    """
+    Ask the username and the email to reset the password
+    """
     userform = ResetPasswordForm(request.POST or None)
     if userform.is_valid():
+        user = None
         try:
-            user = User.objects.get(username=userform.cleaned_data['username'],
-                                    email=userform.cleaned_data['email'])
+            user = User.objects.get(
+                username=userform.cleaned_data['username'],
+                email=userform.cleaned_data['email'],
+            )
         except User.DoesNotExist:
-            messages.error(request, "Cet utilisateur n'existe pas")
-            return form({'userform': userform}, 'captivitate/user.html', request)
-        req = Request()
-        req.type = Request.PASSWD
-        req.user = user
-        req.save()
-        reset_passwd_mail(req, request)
-        messages.success(request,
-                         "Un mail pour l'initialisation du mot de passe a été envoyé")
-        redirect("/")
+            messages.error(request, _("This account does not exist."))
+        finally:
+            # Virtually fill the password reset form from Django Contrib Auth
+            password_reset = PasswordResetForm(data={'email': user.email})
+            if password_reset.is_valid():
+                password_reset.save(
+                    request=request,
+                    use_https=request.is_secure(),
+                )
+                messages.success(request, _("A reset email was sent."))
+                return redirect(reverse('index'))
+            else:
+                messages.error(request, _("The email is invalid."))
+
     return form({'userform': userform}, 'captivitate/user.html', request)
-
-
-def process(request, token):
-    valid_reqs = Request.objects.filter(expires_at__gt=timezone.now())
-    req = get_object_or_404(valid_reqs, token=token)
-
-    if req.type == Request.PASSWD:
-        return process_passwd(request, req)
-    else:
-        messages.error(request, "Entrée incorrecte, contactez un admin")
-        redirect("/")
-
-
-def process_passwd(request, req):
-    u_form = PassForm(request.POST or None)
-    user = req.user
-    if u_form.is_valid():
-        return password_change_action(u_form, user, request, req=req)
-    return form({'userform': u_form}, 'captivitate/user.html', request)

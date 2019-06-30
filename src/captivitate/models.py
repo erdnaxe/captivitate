@@ -4,8 +4,7 @@
 import datetime
 import uuid
 
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
-from django.contrib.auth.models import UserManager as DjangoUserManager
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
@@ -18,75 +17,13 @@ from .apps import CaptivitateConfig
 from .tools import apply
 
 
-class UserManager(DjangoUserManager):
-    def create_user(self, username, email=None, password=None, **extra_fields):
-        """
-        Creates and saves an user
-        """
-        extra_fields.setdefault('is_superuser', False)
-        return self._create_user(username, email, password, **extra_fields)
-
-    def create_superuser(self, username, email, password, **extra_fields):
-        """
-        Creates and saves a superuser
-        """
-        extra_fields.setdefault('is_superuser', True)
-        return self._create_user(username, email, password, **extra_fields)
-
-
-class User(ExportModelOperationsMixin('user'), PermissionsMixin,
-           AbstractBaseUser):
-    STATE_ACTIVE = 0
-    STATE_DISABLED = 1
-    STATE_ARCHIVE = 2
-    STATES = (
-        (0, 'STATE_ACTIVE'),
-        (1, 'STATE_DISABLED'),
-        (2, 'STATE_ARCHIVE'),
+class User(ExportModelOperationsMixin('user'), AbstractUser):
+    comment = models.CharField(
+        verbose_name=_('comment'),
+        max_length=255,
+        blank=True,
     )
-
-    username = models.CharField(
-        _('username'),
-        max_length=150,
-        unique=True,
-        help_text=_(
-            'Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.'),
-        validators=[],
-        error_messages={
-            'unique': _("A user with that username already exists."),
-        },
-    )
-    first_name = models.CharField(_('first name'), max_length=30, blank=True)
-    last_name = models.CharField(_('last name'), max_length=30, blank=True)
-    email = models.EmailField(_('email address'), blank=True)
-    state = models.IntegerField(choices=STATES, default=STATE_ACTIVE)
-    comment = models.CharField(help_text="Commentaire, promo", max_length=255,
-                               blank=True)
-    registered = models.DateTimeField(auto_now_add=True)
-
-    objects = UserManager()
-
-    EMAIL_FIELD = 'email'
-    USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'email']
-
-    class Meta:
-        verbose_name = _('user')
-        verbose_name_plural = _('users')
-
-    @property
-    def is_active(self):
-        return self.state == self.STATE_ACTIVE
-
-    @property
-    def is_staff(self):
-        return self.is_superuser
-
-    def get_full_name(self):
-        return '%s %s' % (self.first_name, self.last_name)
-
-    def get_short_name(self):
-        return self.first_name
 
 
 class Machine(ExportModelOperationsMixin('machine'), models.Model):
@@ -94,13 +31,17 @@ class Machine(ExportModelOperationsMixin('machine'), models.Model):
     mac_address = MACAddressField(integer=False, unique=True)
 
     def add_to_set(self):
-        command_to_execute = ["sudo", "-n"] + CaptivitateConfig.generic_ipset_command.split() + [
-            "add", CaptivitateConfig.ipset_name, str(self.mac_address)]
+        command_to_execute = ["sudo",
+                              "-n"] + CaptivitateConfig.generic_ipset_command.split() + [
+                                 "add", CaptivitateConfig.ipset_name,
+                                 str(self.mac_address)]
         apply(command_to_execute)
 
     def del_to_set(self):
-        command_to_execute = ["sudo", "-n"] + CaptivitateConfig.generic_ipset_command.split() + [
-            "del", CaptivitateConfig.ipset_name, str(self.mac_address)]
+        command_to_execute = ["sudo",
+                              "-n"] + CaptivitateConfig.generic_ipset_command.split() + [
+                                 "del", CaptivitateConfig.ipset_name,
+                                 str(self.mac_address)]
         apply(command_to_execute)
 
 
@@ -132,7 +73,8 @@ class Request(models.Model):
     def save(self, **kwargs):
         if not self.expires_at:
             self.expires_at = timezone.now() \
-                              + datetime.timedelta(hours=CaptivitateConfig.request_expiry_hours)
+                              + datetime.timedelta(
+                hours=CaptivitateConfig.request_expiry_hours)
         if not self.token:
             self.token = str(uuid.uuid4()).replace('-', '')  # remove hyphens
         super().save(**kwargs)

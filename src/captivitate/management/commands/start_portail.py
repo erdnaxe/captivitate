@@ -25,7 +25,7 @@ class Command(BaseCommand):
             "flush", CaptivitateConfig.IPSET_NAME])
 
         # Fill with authorized MACs
-        active_users = User.objects.filter(state=User.STATE_ACTIVE)
+        active_users = User.objects.filter(is_active=True)
         all_machines = Machine.objects.filter(proprio__in=active_users)
         ipset = "%s\nCOMMIT\n" % '\n'.join(
             ["add %s %s" % (CaptivitateConfig.IPSET_NAME, str(m.mac_address)) for m in

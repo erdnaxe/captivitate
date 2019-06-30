@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-30 17:52+0200\n"
+"POT-Creation-Date: 2019-06-30 22:49+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -13,72 +13,68 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: admin.py:34
+#: admin.py:26
 msgid "Personal info"
 msgstr ""
 
-#: admin.py:35
+#: admin.py:28
 msgid "Permissions"
+msgstr ""
+
+#: admin.py:30
+msgid "Important dates"
 msgstr ""
 
 #: apps.py:7
 msgid "captivitate"
 msgstr ""
 
-#: models.py:49 templates/captivitate/profile.html:33
-msgid "username"
-msgstr ""
+#: models.py:22
+msgid "comment"
+msgstr "commentaire"
 
-#: models.py:53
-msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
-
-#: models.py:56
-msgid "A user with that username already exists."
-msgstr ""
-
-#: models.py:59 templates/captivitate/profile.html:25
-msgid "first name"
-msgstr ""
-
-#: models.py:60 templates/captivitate/profile.html:29
-msgid "last name"
-msgstr ""
-
-#: models.py:61 templates/captivitate/profile.html:37
-msgid "email address"
-msgstr ""
-
-#: models.py:74
-msgid "user"
-msgstr ""
-
-#: models.py:75
-msgid "users"
-msgstr ""
-
-#: templates/base.html:48
+#: templates/base.html:47
 msgid "Welcome,"
 msgstr ""
 
-#: templates/base.html:52
+#: templates/base.html:51
 msgid "View admin"
 msgstr "Administration"
 
-#: templates/base.html:56
+#: templates/base.html:55
 msgid "Log out"
 msgstr ""
 
-#: templates/base.html:62 templates/registration/login.html:9
-#: templates/registration/login.html:56
+#: templates/base.html:61 templates/captivitate/index.html:49
+#: templates/registration/login.html:9 templates/registration/login.html:56
 msgid "Log in"
 msgstr ""
 
-#: templates/captivitate/profile.html:45
+#: templates/captivitate/index.html:11
+msgid "Welcome!"
+msgstr "Bienvenue à toi !"
+
+#: templates/captivitate/profile.html:24
+msgid "first name"
+msgstr ""
+
+#: templates/captivitate/profile.html:28
+msgid "last name"
+msgstr ""
+
+#: templates/captivitate/profile.html:32
+msgid "username"
+msgstr ""
+
+#: templates/captivitate/profile.html:36
+msgid "email address"
+msgstr ""
+
+#: templates/captivitate/profile.html:44
 msgid "date joined"
 msgstr ""
 
-#: templates/captivitate/profile.html:49
+#: templates/captivitate/profile.html:48
 msgid "last login"
 msgstr ""
 
@@ -100,3 +96,19 @@ msgstr ""
 #: templates/registration/login.html:52
 msgid "Forgotten your password?"
 msgstr "Mot de passe oublié ?"
+
+#: views.py:69
+msgid "User successfully created! A password initialisation email was sent."
+msgstr "Le compte a été créé ! Un email d'initialisation de mot de passe vient d'être envoyé."
+
+#: views.py:74 views.py:191
+msgid "The email is invalid."
+msgstr "Cet email est invalide."
+
+#: views.py:179
+msgid "This account does not exist."
+msgstr "Ce compte n'existe pas."
+
+#: views.py:188
+msgid "A reset email was sent."
+msgstr "Un mail pour réinitialiser le mot de passe a été envoyé."
