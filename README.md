@@ -23,9 +23,8 @@ For development in a virtualenv:
 $ pip3 install -e . --user
 ```
 
-## Licence
+## License
 
-Ce projet est sous [licence GPL](COPYING) parce que l'on croît au développement
-ouvert.
-La licence GPL implique des droits et des devoirs.
-Veuillez vous référer au fichier de licence pour plus d'informations.
+This project is under the [GPL license](COPYING) because we believe in open
+development.
+Please see COPYING file for more details.
