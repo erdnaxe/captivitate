@@ -1,17 +1,7 @@
 # Running the captive portal
 
-We assume that you are using Debian Stretch or Buster.
-Install the dependencies with APT:
-
-```bash
-# apt install python3-django python3-dateutil python3-django-reversion python3-pip
-```
-
-Then install the remaining dependencies with PIP:
-
-```bash
-# pip3 install django-bootstrap3 django-macaddress
-```
+We assume that you are using Debian Stretch or Buster and that captivitate is
+installed via pip in your Python 3 environment.
 
 Clone the project (can be in `/var/local`):
 

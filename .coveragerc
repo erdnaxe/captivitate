@@ -1,0 +1,10 @@
+[run]
+source = src/captivitate
+omit =
+    src/captivitate/tests/*.py
+    src/captivitate/tests/*/*.py
+    src/captivitate/doc/*.py
+    src/captivitate/migrations/*.py
+
+[html]
+directory = coverage
