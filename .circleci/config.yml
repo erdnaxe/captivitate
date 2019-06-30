@@ -20,7 +20,7 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install -e .
-            pip install coverage
+            pip install coverage django_coverage_plugin
       - run:
           name: setup Code Climate test-reporter
           command: |
@@ -36,4 +36,5 @@ jobs:
             . venv/bin/activate
             ./cc-test-reporter before-build
             coverage run --source=./src/captivitate --omit='*/migrations/*.py' example_project/manage.py test
+            coverage xml
             ./cc-test-reporter after-build --coverage-input-type coverage.py --exit-code $?
