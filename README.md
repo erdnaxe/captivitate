@@ -1,5 +1,9 @@
 # Captivitate - Django captive portal
 
+[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
+[![Maintainability](https://api.codeclimate.com/v1/badges/1923ecfb64aa7553b6d6/maintainability)](https://codeclimate.com/github/erdnaxe/captivitate/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/1923ecfb64aa7553b6d6/test_coverage)](https://codeclimate.com/github/erdnaxe/captivitate/test_coverage)
+
 This captive portal enables users to log in on a guest network.
 Their MAC addresses are captured then injected into an ipset
 enabling external network access.

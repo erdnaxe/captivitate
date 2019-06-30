@@ -18,10 +18,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # Create IP set
-        apply(["sudo", "-n"] + CaptivitateConfig.GENERIC_IPSET_COMMAND.split() + [
+        apply(["sudo", "-n"] + CaptivitateConfig.generic_ipset_command.split() + [
             "create", CaptivitateConfig.IPSET_NAME, "hash:mac", "hashsize", "1024", "maxelem",
             "65536"])
-        apply(["sudo", "-n"] + CaptivitateConfig.GENERIC_IPSET_COMMAND.split() + [
+        apply(["sudo", "-n"] + CaptivitateConfig.generic_ipset_command.split() + [
             "flush", CaptivitateConfig.IPSET_NAME])
 
         # Fill with authorized MACs
@@ -30,7 +30,7 @@ class Command(BaseCommand):
         ipset = "%s\nCOMMIT\n" % '\n'.join(
             ["add %s %s" % (CaptivitateConfig.IPSET_NAME, str(m.mac_address)) for m in
              all_machines])
-        command_to_execute = ["sudo", "-n"] + CaptivitateConfig.GENERIC_IPSET_COMMAND.split() + [
+        command_to_execute = ["sudo", "-n"] + CaptivitateConfig.generic_ipset_command.split() + [
             "restore"]
         process = apply(command_to_execute)
         process.communicate(input=ipset.encode('utf-8'))

@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     'django_prometheus'
 ]
 
-MIDDLEWARE = (
+MIDDLEWARE = [
     'django_prometheus.middleware.PrometheusBeforeMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -67,7 +67,7 @@ MIDDLEWARE = (
     'django.middleware.locale.LocaleMiddleware',
     'django.contrib.sites.middleware.CurrentSiteMiddleware',
     'django_prometheus.middleware.PrometheusAfterMiddleware',
-)
+]
 
 ROOT_URLCONF = 'example_project.urls'
 
@@ -87,7 +87,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'wsgi.application'
+WSGI_APPLICATION = 'example_project.wsgi.application'
 
 
 # Database
@@ -163,17 +163,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # Example: "http://example.com/static/", "http://static.example.com/"
 STATIC_URL = '/static/'
 
-PAGINATION_NUMBER = 25
-
-PAGINATION_LARGE_NUMBER = 8
-
-GENERIC_IPSET_COMMAND = "/sbin/ipset -q "
-
-
 # Auth definition
-
 AUTH_USER_MODEL = 'captivitate.User'
-
 
 try:
     from settings_local import *
