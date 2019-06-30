@@ -1,33 +1,21 @@
 # Byte-compiled / optimized / DLL files
-__pycache__/
+dist
+__pycache__
 *.py[cod]
 *$py.class
 *.swp
+*.egg-info
+_build
+.tox
+.coverage
+coverage
 
 # Translations
 *.mo
 *.pot
 
-# Django stuff
-*.log
-local_settings.py
-db.sqlite3
-.coverage
-
 # Jupyter Notebook
 .ipynb_checkpoints
-
-# pyenv
-.python-version
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
 
 # Spyder project settings
 .spyderproject
@@ -37,13 +25,4 @@ venv.bak/
 .ropeproject
 
 # PyCharm project settings
-.idea/
-
-# Django statics
-static_files/
-
-# re2o specific
-settings_local.py
-re2o.png
-media/
-*.sql
+.idea
