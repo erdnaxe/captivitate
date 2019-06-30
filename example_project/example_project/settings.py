@@ -58,7 +58,6 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.contrib.admindocs.middleware.XViewMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -129,8 +128,6 @@ LANGUAGES = [
     ('fr', _('French')),
 ]
 
-LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale')]
-
 TIME_ZONE = 'Europe/Paris'
 
 USE_I18N = True
@@ -138,15 +135,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
-# django-bootstrap3 config dictionnary
-BOOTSTRAP3 = {
-    'jquery_url': '/static/js/jquery-2.2.4.min.js',
-    'base_url': '/static/bootstrap/',
-    'include_jquery': True,
-}
-
-BOOTSTRAP_BASE_URL = '/static/bootstrap/'
 
 
 # Static files (CSS, JavaScript, Images)
