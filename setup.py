@@ -43,7 +43,6 @@ setup(
         'Django>=1.11,<2.3',
         'django-bootstrap3>=11.0',
         'django-macaddress>=1.5',
-        'dateutil>=2.5.3',
         'django-reversion>=2.0.8',
     ],
     tests_require=[],
