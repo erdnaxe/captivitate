@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bootstrap3',
-    'users',
+    'captivitate',
     'reversion',
     'django_prometheus'
 ]
