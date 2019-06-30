@@ -10,6 +10,7 @@ from django_prometheus import exports
 
 urlpatterns = [
     url(r'^', include('captivitate.urls')),
+    url(r'^$', RedirectView.as_view(url='/'), name='index'),
 
     # Prometheus metrics
     url(r'^metrics$', exports.ExportToDjangoView,
