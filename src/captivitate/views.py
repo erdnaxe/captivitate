@@ -141,7 +141,7 @@ def get_ip(request):
 
 def capture_mac(request, users, verbose=True):
     remote_ip = get_ip(request)
-    if ipaddress.ip_address(remote_ip) in ipaddress.ip_network(
+    if remote_ip and ipaddress.ip_address(remote_ip) in ipaddress.ip_network(
             CaptivitateConfig.CAPTIVE_IP_RANGE):
         mac_addr = mac_from_ip(remote_ip)
         if mac_addr:
