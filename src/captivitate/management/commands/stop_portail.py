@@ -8,8 +8,8 @@ It empties iptables and deactivates routing.
 
 from django.core.management.base import BaseCommand
 
-from portail_captif.settings import AUTORIZED_INTERFACES
-from users.tools import disable_iptables, apply
+from .tools import disable_iptables, apply
+from .apps import CaptivitateConfig
 
 
 class Command(BaseCommand):
@@ -20,7 +20,7 @@ class Command(BaseCommand):
         disable_iptables()
 
         # Desactivation du routage sur les bonnes if
-        for interface in AUTORIZED_INTERFACES:
+        for interface in CaptivitateConfig.AUTORIZED_INTERFACES:
             apply(["sudo", "-n", "sysctl",
                    "net.ipv6.conf.%s.forwarding=0" % interface])
             apply(["sudo", "-n", "sysctl",

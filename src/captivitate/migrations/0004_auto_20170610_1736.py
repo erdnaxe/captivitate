@@ -10,7 +10,7 @@ from django.conf import settings
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0003_machines'),
+        ('captivitate', '0003_machines'),
     ]
 
     operations = [

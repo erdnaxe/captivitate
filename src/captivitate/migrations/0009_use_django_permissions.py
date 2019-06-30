@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('auth', '0008_alter_user_username_max_length'),
-        ('users', '0008_rename_admin_is_superuser'),
+        ('captivitate', '0008_rename_admin_is_superuser'),
     ]
 
     operations = [

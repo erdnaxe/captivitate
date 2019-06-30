@@ -3,20 +3,20 @@
 from __future__ import unicode_literals
 
 from django.db import migrations
-import users.models
+import captivitate.models
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0007_rename_name_first_name'),
+        ('captivitate', '0007_rename_name_first_name'),
     ]
 
     operations = [
         migrations.AlterModelManagers(
             name='user',
             managers=[
-                ('objects', users.models.UserManager()),
+                ('objects', captivitate.models.UserManager()),
             ],
         ),
         migrations.RenameField(

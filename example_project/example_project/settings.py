@@ -172,7 +172,7 @@ GENERIC_IPSET_COMMAND = "/sbin/ipset -q "
 
 # Auth definition
 
-AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'captivitate.User'
 
 
 try:

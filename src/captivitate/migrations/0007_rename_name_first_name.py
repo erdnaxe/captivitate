@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0006_rename_surname_last_name'),
+        ('captivitate', '0006_rename_surname_last_name'),
     ]
 
     operations = [

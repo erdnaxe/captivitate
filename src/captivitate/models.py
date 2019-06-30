@@ -14,8 +14,7 @@ from django.utils.translation import ugettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 from macaddress.fields import MACAddressField
 
-from portail_captif.settings import GENERIC_IPSET_COMMAND, IPSET_NAME, \
-    REQ_EXPIRE_HRS
+from .apps import CaptivitateConfig
 from .tools import apply
 
 
@@ -95,13 +94,13 @@ class Machine(ExportModelOperationsMixin('machine'), models.Model):
     mac_address = MACAddressField(integer=False, unique=True)
 
     def add_to_set(self):
-        command_to_execute = ["sudo", "-n"] + GENERIC_IPSET_COMMAND.split() + [
-            "add", IPSET_NAME, str(self.mac_address)]
+        command_to_execute = ["sudo", "-n"] + CaptivitateConfig.generic_ipset_command.split() + [
+            "add", CaptivitateConfig.ipset_name, str(self.mac_address)]
         apply(command_to_execute)
 
     def del_to_set(self):
-        command_to_execute = ["sudo", "-n"] + GENERIC_IPSET_COMMAND.split() + [
-            "del", IPSET_NAME, str(self.mac_address)]
+        command_to_execute = ["sudo", "-n"] + CaptivitateConfig.generic_ipset_command.split() + [
+            "del", CaptivitateConfig.ipset_name, str(self.mac_address)]
         apply(command_to_execute)
 
 
@@ -133,7 +132,7 @@ class Request(models.Model):
     def save(self, **kwargs):
         if not self.expires_at:
             self.expires_at = timezone.now() \
-                              + datetime.timedelta(hours=REQ_EXPIRE_HRS)
+                              + datetime.timedelta(hours=CaptivitateConfig.request_expiry_hours)
         if not self.token:
             self.token = str(uuid.uuid4()).replace('-', '')  # remove hyphens
         super().save(**kwargs)

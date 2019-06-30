@@ -16,11 +16,10 @@ from django.template.context_processors import csrf
 from django.utils import timezone
 from reversion import revisions as reversion
 
-from portail_captif.settings import REQ_EXPIRE_STR, DEFAULT_FROM_EMAIL, \
-    ASSO_NAME, ASSO_EMAIL, SITE_NAME, CAPTIVE_IP_RANGE, CAPTIVE_WIFI
-from users.forms import PassForm, ResetPasswordForm, BaseInfoForm
-from users.models import User, Request, Machine
-from users.tools import mac_from_ip
+from .forms import PassForm, ResetPasswordForm, BaseInfoForm
+from .models import User, Request, Machine
+from .tools import mac_from_ip
+from .apps import CaptivitateConfig
 
 
 def form(ctx, template, request):
@@ -71,15 +70,15 @@ def reset_passwd_mail(req, request):
     t = loader.get_template('users/email_passwd_request')
     c = {
         'name': str(req.user.first_name) + ' ' + str(req.user.last_name),
-        'asso': ASSO_NAME,
-        'asso_mail': ASSO_EMAIL,
-        'site_name': SITE_NAME,
+        'asso': CaptivitateConfig.ASSO_NAME,
+        'asso_mail': CaptivitateConfig.ASSO_EMAIL,
+        'site_name': CaptivitateConfig.SITE_NAME,
         'url': request.build_absolute_uri(
             reverse('users:process', kwargs={'token': req.token})),
-        'expire_in': REQ_EXPIRE_STR,
+        'expire_in': CaptivitateConfig.request_expiry_string,
     }
-    send_mail('Votre compte %s' % SITE_NAME, t.render(c),
-              DEFAULT_FROM_EMAIL, [req.user.email], fail_silently=False)
+    send_mail('Votre compte %s' % CaptivitateConfig.SITE_NAME, t.render(c),
+              CaptivitateConfig.default_from_email, [req.user.email], fail_silently=False)
     return
 
 
@@ -143,7 +142,7 @@ def get_ip(request):
 def capture_mac(request, users, verbose=True):
     remote_ip = get_ip(request)
     if ipaddress.ip_address(remote_ip) in ipaddress.ip_network(
-            CAPTIVE_IP_RANGE):
+            CaptivitateConfig.CAPTIVE_IP_RANGE):
         mac_addr = mac_from_ip(remote_ip)
         if mac_addr:
             machine = Machine()
@@ -163,7 +162,7 @@ def capture_mac(request, users, verbose=True):
     else:
         if verbose:
             messages.error(request,
-                           "Merci de vous connecter sur le réseau du portail captif pour capturer la machine (WiFi %s)" % CAPTIVE_WIFI)
+                           "Merci de vous connecter sur le réseau du portail captif pour capturer la machine (WiFi %s)" % CaptivitateConfig.CAPTIVE_WIFI)
 
 
 def capture_mac_afterlogin(sender, user, request, **kwargs):
