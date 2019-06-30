@@ -52,3 +52,12 @@ msgstr ""
 #: users/models.py:76
 msgid "users"
 msgstr ""
+
+#: templates/admin/base_site.html:32 templates/admin/base_site.html:51
+msgid "View admin"
+msgstr "Administration"
+
+#: templates/registration/login.html:52
+msgid "Forgotten your password?"
+msgstr "Mot de passe oublié ?"
+
