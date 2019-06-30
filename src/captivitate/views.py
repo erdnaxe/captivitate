@@ -31,7 +31,7 @@ def index(request):
     """
     Show logged in user profile or index page
     """
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         try:
             users = User.objects.get(pk=request.user.id)
         except User.DoesNotExist:
