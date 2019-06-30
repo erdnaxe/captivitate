@@ -9,7 +9,7 @@ from django.views.generic import RedirectView
 from django_prometheus import exports
 
 urlpatterns = [
-    url(r'^', include('users.urls')),
+    url(r'^', include('captivitate.urls')),
 
     # Prometheus metrics
     url(r'^metrics$', exports.ExportToDjangoView,
@@ -23,7 +23,7 @@ urlpatterns = [
     url(r'^i18n/', include('django.conf.urls.i18n')),
     url(r'^accounts/', include('django.contrib.auth.urls')),
     url(r'^accounts/profile/',
-        RedirectView.as_view(pattern_name='users:index')),
+        RedirectView.as_view(pattern_name='captivitate:index')),
     url(r'^admin/login/', RedirectView.as_view(pattern_name='login')),
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', admin.site.urls),

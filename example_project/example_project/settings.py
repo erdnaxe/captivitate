@@ -69,7 +69,7 @@ MIDDLEWARE = (
     'django_prometheus.middleware.PrometheusAfterMiddleware',
 )
 
-ROOT_URLCONF = 'urls'
+ROOT_URLCONF = 'example_project.urls'
 
 TEMPLATES = [
     {
