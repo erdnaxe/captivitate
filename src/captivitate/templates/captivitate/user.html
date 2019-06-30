@@ -3,16 +3,10 @@
 SPDX-License-Identifier: GPL-2.0-or-later
 {% endcomment %}
 
-{% load bootstrap3 %}
+{% load crispy_forms_tags %}
 
 {% block title %}Création et modification d'utilisateur{% endblock %}
 
 {% block content %}
-    {% bootstrap_form_errors userform %}
-
-    <form class="form" method="post">
-        {% csrf_token %}
-        {% bootstrap_form userform %}
-        {% bootstrap_button "Soumettre" button_type="submit" icon="star" %}
-    </form>
+    {% crispy userform %}
 {% endblock %}

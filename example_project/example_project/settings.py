@@ -11,8 +11,6 @@ Django settings for captivitate project.
 import os
 
 from django.utils.translation import gettext_lazy as _
-
-# Compatibility with Bootstrap 3
 from django.contrib.messages import constants as messages
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -46,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'bootstrap3',
+    'crispy_forms',
     'captivitate',
     'reversion',
     'django_prometheus'
@@ -151,6 +149,21 @@ STATIC_URL = '/static/'
 
 # Auth definition
 AUTH_USER_MODEL = 'captivitate.User'
+
+# Django Crispy forms
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
+
+# Compatibility with Bootstrap 3
+from django.contrib.messages import constants as messages
+
+# Django Contrib messages
+MESSAGE_TAGS = {
+    messages.DEBUG: 'alert-info',
+    messages.INFO: 'alert-info',
+    messages.SUCCESS: 'alert-success',
+    messages.WARNING: 'alert-warning',
+    messages.ERROR: 'alert-danger',
+}
 
 try:
     from settings_local import *

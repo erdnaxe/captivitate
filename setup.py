@@ -41,7 +41,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'Django>=1.11,<2.3',
-        'django-bootstrap3>=11.0',
+        'django-crispy-forms>=1.6',
         'django-macaddress>=1.5',
         'django-reversion>=2.0.8',
         'django-prometheus>=1.0.6',

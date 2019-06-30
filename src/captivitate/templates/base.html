@@ -3,7 +3,6 @@ SPDX-License-Identifier: GPL-2.0-or-later
 {% endcomment %}
 
 {% load staticfiles %}
-{% load bootstrap3 %}
 {% load i18n %}
 
 <!DOCTYPE html>
@@ -69,8 +68,11 @@ SPDX-License-Identifier: GPL-2.0-or-later
     </nav>
 
     <div id="main" class="container pt4">
-        {# Display django.contrib.messages as Bootstrap alerts #}
-        {% bootstrap_messages %}
+        {% for message in messages %}
+            <div class="alert {{ message.tags }} alert-dismissible" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
 
         {% block content %}{% endblock %}
     </div>

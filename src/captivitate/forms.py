@@ -5,6 +5,8 @@ from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.validators import MinLengthValidator
 from django.forms import ModelForm
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Submit
 
 from .models import User
 
@@ -98,6 +100,11 @@ class ResetPasswordForm(forms.Form):
 
 
 class BaseInfoForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.add_input(Submit('submit', 'Envoyer'))
+
     class Meta:
         model = User
         fields = [
