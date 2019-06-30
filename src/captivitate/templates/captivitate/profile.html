@@ -11,7 +11,7 @@ SPDX-License-Identifier: GPL-2.0-or-later
 {% block content %}
     <h2>Compte</h2>
     <div>
-        <a class="btn btn-primary btn-sm" role="button" href="{% url 'users:edit-info' user.id %}">
+        <a class="btn btn-primary btn-sm" role="button" href="{% url 'captivitate:edit-info' user.id %}">
             <i class="glyphicon glyphicon-edit"></i>
             Editer
         </a>
@@ -63,7 +63,7 @@ SPDX-License-Identifier: GPL-2.0-or-later
     </dl>
 
     <h2>Machines enregistrées</h2>
-    <a class="btn btn-primary btn-sm" role="button" href="{% url 'users:capture' %}">
+    <a class="btn btn-primary btn-sm" role="button" href="{% url 'captivitate:capture' %}">
         <i class="glyphicon glyphicon-flash"></i>
         Enregistrer la machine utilisée actuellement
     </a>

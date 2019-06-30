@@ -39,21 +39,21 @@ def index(request):
         machines_list = Machine.objects.filter(proprio=users)
         return render(
             request,
-            'users/profile.html',
+            'captivitate/profile.html',
             {
                 'user': users,
                 'machines_list': machines_list,
             }
         )
     else:
-        return form({}, 'users/index.html', request)
+        return form({}, 'captivitate/index.html', request)
 
 
 def password_change_action(u_form, user, request, req=False):
     """ Fonction qui effectue le changeemnt de mdp bdd"""
     if u_form.cleaned_data['passwd1'] != u_form.cleaned_data['passwd2']:
         messages.error(request, "Les 2 mots de passe différent")
-        return form({'userform': u_form}, 'users/user.html', request)
+        return form({'userform': u_form}, 'captivitate/user.html', request)
     user.set_password(u_form.cleaned_data['passwd1'])
     with transaction.atomic(), reversion.create_revision():
         user.save()
@@ -67,14 +67,14 @@ def password_change_action(u_form, user, request, req=False):
 
 def reset_passwd_mail(req, request):
     """ Prend en argument un request, envoie un mail de réinitialisation de mot de pass """
-    t = loader.get_template('users/email_passwd_request')
+    t = loader.get_template('captivitate/email_passwd_request')
     c = {
         'name': str(req.user.first_name) + ' ' + str(req.user.last_name),
         'asso': CaptivitateConfig.ASSO_NAME,
         'asso_mail': CaptivitateConfig.ASSO_EMAIL,
         'site_name': CaptivitateConfig.SITE_NAME,
         'url': request.build_absolute_uri(
-            reverse('users:process', kwargs={'token': req.token})),
+            reverse('captivitate:process', kwargs={'token': req.token})),
         'expire_in': CaptivitateConfig.request_expiry_string,
     }
     send_mail('Votre compte %s' % CaptivitateConfig.SITE_NAME, t.render(c),
@@ -99,7 +99,7 @@ def new_user(request):
                          "L'utilisateur %s a été créé, un mail pour l'initialisation du mot de passe a été envoyé" % user.username)
         capture_mac(request, user)
         return redirect("/")
-    return form({'userform': user}, 'users/user.html', request)
+    return form({'userform': user}, 'captivitate/user.html', request)
 
 
 @login_required
@@ -123,7 +123,7 @@ def edit_info(request, userid):
                 field for field in user.changed_data))
         messages.success(request, "L'user a bien été modifié")
         return redirect("/")
-    return form({'userform': user}, 'users/user.html', request)
+    return form({'userform': user}, 'captivitate/user.html', request)
 
 
 def get_ip(request):
@@ -192,7 +192,7 @@ def reset_password(request):
                                     email=userform.cleaned_data['email'])
         except User.DoesNotExist:
             messages.error(request, "Cet utilisateur n'existe pas")
-            return form({'userform': userform}, 'users/user.html', request)
+            return form({'userform': userform}, 'captivitate/user.html', request)
         req = Request()
         req.type = Request.PASSWD
         req.user = user
@@ -201,7 +201,7 @@ def reset_password(request):
         messages.success(request,
                          "Un mail pour l'initialisation du mot de passe a été envoyé")
         redirect("/")
-    return form({'userform': userform}, 'users/user.html', request)
+    return form({'userform': userform}, 'captivitate/user.html', request)
 
 
 def process(request, token):
@@ -220,4 +220,4 @@ def process_passwd(request, req):
     user = req.user
     if u_form.is_valid():
         return password_change_action(u_form, user, request, req=req)
-    return form({'userform': u_form}, 'users/user.html', request)
+    return form({'userform': u_form}, 'captivitate/user.html', request)

@@ -5,7 +5,7 @@ from django.conf.urls import url
 
 from . import views
 
-app_name = 'users'
+app_name = 'captivitate'
 urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^new_user/$', views.new_user, name='new-user'),
