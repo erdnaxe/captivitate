@@ -12,8 +12,6 @@ import os
 
 from django.utils.translation import gettext_lazy as _
 
-from .settings_local import *
-
 # Compatibility with Bootstrap 3
 from django.contrib.messages import constants as messages
 

@@ -34,7 +34,6 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            cd example_project
-            ../cc-test-reporter before-build
-            coverage run --source=../src/captivitate --omit='*/migrations/*.py' manage.py test
-            ../cc-test-reporter after-build --coverage-input-type coverage.py --exit-code $?
+            ./cc-test-reporter before-build
+            coverage run --source=./src/captivitate --omit='*/migrations/*.py' example_project/manage.py test
+            ./cc-test-reporter after-build --coverage-input-type coverage.py --exit-code $?
