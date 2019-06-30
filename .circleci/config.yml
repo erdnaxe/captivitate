@@ -13,7 +13,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: v1-dependencies-{{ checksum "setup.py" }}
+          key: v1-dependencies-{{ checksum "setup.py" }}
       - run:
           name: install dependencies
           command: |
@@ -35,5 +35,5 @@ jobs:
           command: |
             . venv/bin/activate
             ./cc-test-reporter before-build
-            coverage run --source=./ --omit='*/migrations/*.py' manage.py test
+            coverage run --source=./src/captivitate --omit='*/migrations/*.py' example_project/manage.py test
             ./cc-test-reporter after-build --coverage-input-type coverage.py --exit-code $?
