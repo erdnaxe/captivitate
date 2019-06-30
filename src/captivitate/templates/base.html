@@ -23,10 +23,11 @@ SPDX-License-Identifier: GPL-2.0-or-later
     <meta name="msapplication-config" content="{% static "favicon/browserconfig.xml" %}">
     <meta name="theme-color" content="#ffffff">
 
-    {% bootstrap_css %}
-    <link rel="stylesheet" href="{% static "/css/base.css" %}">
+    <link href="{% static "/bootstrap/css/bootstrap.min.css" %}" rel="stylesheet">
+    <link href="{% static "/css/base.css" %}" rel="stylesheet">
 
-    {% bootstrap_javascript %}
+    <script src="{% static "js/jquery-2.2.4.min.js" %}"></script>
+    <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
 </head>
 <body>
 <div id="wrap">
