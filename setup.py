@@ -45,7 +45,7 @@ setup(
         'django-macaddress>=1.5',
         'django-reversion>=2.0.8',
         'django-prometheus>=1.0.6',
-        'django-crans-theme>=0.1.0',
+        'django-crans-theme>=0.1.1',
     ],
     tests_require=[],
 )
